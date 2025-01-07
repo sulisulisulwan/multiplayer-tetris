@@ -1,0 +1,84 @@
+
+.playfield-square {
+  background-color: black;
+  height: 20px;
+  width: 20px;
+  opacity: .8;
+}
+
+.tetrimonio-square {
+  border-style: solid;
+  border-color: black;
+  border-radius: 20%;
+  height: 16px;
+  width: 16px;
+}
+
+.tetrimino-shimmer {
+  box-shadow: 2px 2px 10px 3px white;
+}
+
+.iTet { background-color: rgb(141, 141, 141); }
+.tTet { background-color: #ff00ff; }
+.jTet { background-color: plum; }
+.oTet { background-color: rgb(119, 3, 101); }
+.sTet { background-color: powderblue; }
+.lTet { background-color: cyan; }
+.zTet { background-color: white; }
+
+.trail-0 {
+  background-color: rgb(40,40,40);
+  height: 16px;
+  width: 16px;
+}
+
+.trail-1 {
+  background-color: rgb(80,80,80);
+  height: 16px;
+  width: 16px;
+}
+.trail-2 {
+  background-color: rgb(120,120,120);
+  height: 16px;
+  width: 16px;
+}
+.trail-3 {
+  background-color: rgb(180,180,180);
+  height: 16px;
+  width: 16px;
+}
+.trail-4 {
+  background-color: rgb(220,220,220);
+  height: 16px;
+  width: 16px;
+}
+.trail-5 {
+  /* box-shadow: 2px 2px 10px 3px white; */
+  background-color: rgb(255,255,255);
+  height: 16px;
+  width: 16px;
+}
+
+.ghostTet {
+  background-color: black;
+  color: black;
+  border-style: solid;
+  border-color: white;
+  border-radius: 20%;
+  opacity: .5;
+}
+
+.emptyTet {
+  
+}
+
+.tetrimino-tile {
+  margin-bottom: 12px;
+}
+
+.tetrimino-tile-row {
+  display: flex;
+  flex-direction: row;
+  font-family: monospace;
+  justify-content: center;
+}
