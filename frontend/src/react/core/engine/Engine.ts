@@ -103,7 +103,7 @@ export class Engine {
       this.setCurrentPhaseName(currentGamePhase)
       this.setCurrentPhase(currentGamePhase)
     }
-    this.currentPhase.syncToLocalState(stateData)
+    this.currentPhase.syncToReactAppState(stateData)
     this.currentPhase.execute()
   }
 

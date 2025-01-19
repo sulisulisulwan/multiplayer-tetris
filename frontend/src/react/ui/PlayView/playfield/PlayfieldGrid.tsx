@@ -47,7 +47,14 @@ const PlayfieldGrid = (props: playfieldGridPropsIF) => {
       fontFamily: 'monospace',
       boxShadow: '3px 3px 20px white'
     }}>
-      { playfieldData.map((rowData, i) => <Row key={`row-${i}`} rowData={rowData}/>) }
+      { 
+        playfieldData.map((rowData, i) => 
+          <div key={`row-${i}`} style={{ display: 'flex' }}>
+            <span style={{ width: 20 }}>{i + 20}</span>
+            <Row key={`row-${i}`} rowData={rowData}/>
+          </div>
+        ) 
+      }
     </div>
   )
 }

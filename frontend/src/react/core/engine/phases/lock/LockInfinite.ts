@@ -1,8 +1,8 @@
-import BasePhase from "../BasePhase";
 import { makeCopy } from "../../../utils/utils";
 import { appStateIF, sharedHandlersIF, tetriminoIF } from "../../../../types";
+import TetriminoActivePhase from "../TetriminoActivePhase";
 
-export default class LockInfinite extends BasePhase {
+export default class LockInfinite extends TetriminoActivePhase {
 
   constructor(sharedHandlers: sharedHandlersIF) {
     super(sharedHandlers)
@@ -10,7 +10,7 @@ export default class LockInfinite extends BasePhase {
 
   execute() {
     // console.log('>>>> LOCK INFINITE PHASE')
-    const newState = {} as appStateIF
+    let newState = {} as appStateIF
 
     // If at the beginning of the lockdown phase (lockTimeout hasn't been set), set the lockdown timer
     if (!this.appState.lockTimeoutId) {
@@ -41,22 +41,9 @@ export default class LockInfinite extends BasePhase {
     }
 
     // Otherwise, the lockdown timer is still ticking... Handle player motions..
-    const { override } = this.appState.playerAction.autoRepeat
-    if (!override) {
-      const autoRepeatDirection = this.appState.playerAction.autoRepeat.left ? 'left' : 'right'
-      if (this.appState.playerAction.autoRepeat[autoRepeatDirection] && this.appState[`${autoRepeatDirection}IntervalId`] === null) {
-        newState.autoRepeatDelayTimeoutId = this.setAutoRepeatDelayTimeout()
-        newState[`${autoRepeatDirection}IntervalId`] = this.setContinuousLeftOrRight(autoRepeatDirection)
-      }
-    } else if (this.appState[`${override}IntervalId` as keyof appStateIF] === null) {
-      newState.autoRepeatDelayTimeoutId = this.setAutoRepeatDelayTimeout()
-      const intervalId = this.setContinuousLeftOrRight(override)
-      override === 'left' ? newState.leftIntervalId = intervalId : newState.rightIntervalId = intervalId
-    }
+    newState = this.handleAutorepeatActions(newState)
 
-    if (Object.keys(newState).length === 0) {
-      return
-    }
+    if (Object.keys(newState).length === 0) return
     
     this.setAppState((prevState) => ({ ...prevState, ...newState}))
 
@@ -109,44 +96,6 @@ export default class LockInfinite extends BasePhase {
     const lowestPlayfieldRowOfTetrimino = this.tetriminoMovementHandler.getLowestPlayfieldRowOfTetrimino(currentTetrimino)
     const gameIsOver = lowestPlayfieldRowOfTetrimino < 20 ? true : false
     return gameIsOver
-  }
-
-  setAutoRepeatDelayTimeout() {
-    return setTimeout(this.unsetAutoRepeatDelayTimeoutId.bind(this), 300)
-  }
-
-  unsetAutoRepeatDelayTimeoutId() {
-    const newState = {} as appStateIF
-    newState.autoRepeatDelayTimeoutId = null
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-  }
-
-  setContinuousLeftOrRight(direction: string) {
-    return setInterval(this.continuousLeftOrRight.bind(this), 50, direction)
-  }
-
-  continuousLeftOrRight(playerAction: string) {
-
-    if (this.appState.autoRepeatDelayTimeoutId) { 
-      return 
-    }
-
-    const { playfield, currentTetrimino } = this.appState
-    const newState = {} as appStateIF
-
-    const { 
-      newPlayfield, 
-      newTetrimino, 
-      successfulMove
-    } = this.tetriminoMovementHandler.moveOne(playerAction, playfield, currentTetrimino)
-    
-    if (successfulMove)  {
-      newState.currentTetrimino = newTetrimino
-      newState.playfield = newPlayfield
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
-    }
-
   }
 
 }

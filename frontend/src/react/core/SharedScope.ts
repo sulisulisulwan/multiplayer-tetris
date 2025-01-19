@@ -37,7 +37,7 @@ export class SharedScope {
     this.backgroundMusic = sharedHandlers.backgroundMusic 
   }
 
-  syncToLocalState(appState: appStateIF) {
+  syncToReactAppState(appState: appStateIF) {
     const appStateCopy = makeCopy(appState) as appStateIF
     this.appState = appStateCopy
   }

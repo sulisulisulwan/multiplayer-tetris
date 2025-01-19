@@ -4,7 +4,7 @@ export default function actionLeftAndRight(eventData: eventDataIF) {
   let { playerAction, playfield, currentTetrimino } = this.appState
   const { autoRepeat } = playerAction
   let { override } = autoRepeat
-  const { strokeType, action } = eventData
+  const { strokeType, action, currKeystrokes } = eventData
   
   const newState = {} as appStateIF
 
@@ -25,6 +25,8 @@ export default function actionLeftAndRight(eventData: eventDataIF) {
 
   // Determine what action will be taken.  Override always determines this.
   if (strokeType === 'keydown') {
+
+    // console.log(currKeystrokes.has('softdrop'))
 
     if (this.appState.playerAction.autoRepeat[action] && override === action) {
       return

@@ -8,6 +8,8 @@ export class PlayerControl extends SharedScope {
   private keystrokeMap: Map<string, string>
   protected scoreItemFactory: ScoreItemFactory
   private playerActions: playerActionHandlersIF
+  private currKeystrokes: Set<string>
+
   constructor(sharedHandlers: sharedHandlersIF) {
 
     super(sharedHandlers)
@@ -46,13 +48,15 @@ export class PlayerControl extends SharedScope {
       pauseGame: actionPauseGame.bind(this)
     }
 
+    this.currKeystrokes = new Set()
     this.scoreItemFactory = new ScoreItemFactory()
 
   }
 
   public keystrokeHandler(appState: appStateIF, e: React.KeyboardEvent) {
 
-    this.syncToLocalState(appState)
+    this.syncToReactAppState(appState)
+    
 
     if (!['falling', 'lock'].includes(this.appState.currentGamePhase)) {
       return 
@@ -61,14 +65,18 @@ export class PlayerControl extends SharedScope {
     const eventData: eventDataIF = {
       key: e.key,
       strokeType: e.type,
-      action: this.keystrokeMap.get(e.key)
+      action: this.keystrokeMap.get(e.key) || null,
+      currKeystrokes: null
     }
+
+
 
     if (eventData.action === 'left' 
       || eventData.action === 'right'
       || eventData.action === 'flipClockwise'
       || eventData.action === 'flipCounterClockwise'
     ) {
+
 
       // If there are no more extended moves left, and the Tetrimino has touched down on a surface, any keydown actions will be ignored forcing lockdown
       if (this.appState.extendedLockdownMovesRemaining <= 0 && eventData.strokeType === 'keydown') {
@@ -80,9 +88,18 @@ export class PlayerControl extends SharedScope {
       }
     }
 
-    if (!eventData.action || this.appState.currentTetrimino.status === 'locked') {
+    if (eventData.action === null || this.appState.currentTetrimino.status === 'locked') {
       return
     }
+
+    if (eventData.strokeType === 'keydown') {
+      this.currKeystrokes.add(eventData.action)
+    }
+    if (eventData.strokeType === 'keyup') {
+      this.currKeystrokes.delete(eventData.action)
+    }
+
+    eventData.currKeystrokes = this.currKeystrokes
 
     // Execute the player's action
     const playerActionHandler = this.playerActions[eventData.action as keyof playerActionHandlersIF]

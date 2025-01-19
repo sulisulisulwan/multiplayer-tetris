@@ -1,11 +1,8 @@
 import { appStateIF, sharedHandlersIF } from "../../../../types";
 import ScoreItemFactory from "../../../scoring/ScoreItemFactory";
-import trailHandler from "../../../tetrimino/trail/Trail";
-import BasePhase from "../BasePhase";
+import FallingPhase from "./Falling";
 
-
-
-export default class FallingExtended extends BasePhase {
+export default class FallingExtended extends FallingPhase {
 
   private scoreItemFactory: ScoreItemFactory
 
@@ -14,68 +11,11 @@ export default class FallingExtended extends BasePhase {
     this.scoreItemFactory = new ScoreItemFactory()
   }
 
-  /**
-   * Will re-trigger when:
-   * - Player makes any kind of move 
-   * - Continuous fall event set, triggered, or unset
-   * -  
-   */
-  execute() {
-    // console.log('>>>> FALLING EXTENDED PHASE')
-
-    const newState = {} as appStateIF
-
-    // Kickoff motion intervals
-    const { override } = this.appState.playerAction.autoRepeat
-
-    if (!override) {
-      const autoRepeatDirection = this.appState.playerAction.autoRepeat.left ? 'left' : 'right'
-      if (this.appState.playerAction.autoRepeat[autoRepeatDirection] && this.appState[`${autoRepeatDirection}IntervalId`] === null) {
-        newState.autoRepeatDelayTimeoutId = this.setAutoRepeatDelayTimeout()
-        newState[`${autoRepeatDirection}IntervalId`] = this.setContinuousLeftOrRight(autoRepeatDirection)
-      }
-
-    } else if (this.appState[`${override}IntervalId` as keyof appStateIF] === null) {
-      newState.autoRepeatDelayTimeoutId = this.setAutoRepeatDelayTimeout()
-      const intervalId = this.setContinuousLeftOrRight(override)
-      override === 'left' ? newState.leftIntervalId = intervalId : newState.rightIntervalId = intervalId
-    }
-
-    if (this.appState.fallIntervalId === null) {
-      newState.fallIntervalId = this.setContinuousFallEvent()
-    }
-
-    // If state hasn't changed, don't set state.
-    if (Object.keys(newState).length === 0) {
-      return
-    }
-    
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-  }
-
-  setAutoRepeatDelayTimeout() {
-    return setTimeout(this.unsetAutoRepeatDelayTimeoutId.bind(this), 300)
-  }
-
-  unsetAutoRepeatDelayTimeoutId() {
-    const newState = {} as appStateIF
-    newState.autoRepeatDelayTimeoutId = null
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-  }
-
-  setContinuousLeftOrRight(direction: string) {
-    return setInterval(this.continuousLeftOrRight.bind(this), 50, direction)
-  }
-
-  setContinuousFallEvent() {
-    return setInterval(this.continuousFallEvent.bind(this), this.appState.fallSpeed)
-  }
-
   continuousFallEvent() {
     
     const newState = {} as appStateIF
-
     const { playfield, currentTetrimino, fallIntervalId } = this.appState
+
 
     let { 
       newPlayfield, 
@@ -88,17 +28,16 @@ export default class FallingExtended extends BasePhase {
 
       // Handle softdrop scoring
       if (this.appState.playerAction.softdrop) {
-        /* TODO: sometimes the NEWEST tetrimino hasn't yet been
-          been drawn before the TRAIL has be drawn.  This causes
-          the actual tetrimino to be drawn over by the trail.
+        /* TODO: 
+        The reason for the trail bug is this:
 
-          We need to figure out how to ENSURE that the MOST CURRENT
-          tetrimino has been drawn BEFORE the trail.
+        A mysterious phantom tetrimino pops up when we log the playfield to console.
+        tap the softhold button intermittently, and at the point at which the lagging trail
+        appears, a phantom tetrimino pops up on the log of the playfield in a position.
+        Additionally, two trail row removals and additions go unlogged
 
-          This probably happens when the continuousFallEvent
-          which is a 
         */
-        newPlayfield = trailHandler.addToSoftdropTrail(newTetrimino, newPlayfield)
+
         const scoreItem = this.scoreItemFactory.getItem('softdrop', this.appState, null)
         newState.totalScore = this.scoringHandler.updateScore(this.appState.totalScore, scoreItem)
       }
@@ -122,8 +61,6 @@ export default class FallingExtended extends BasePhase {
 
       if (tetriminoWillHaveReachedSurface) {
         if (this.appState.playerAction.softdrop) {
-          // newPlayfield = trailHandler.clearSoftdropTrail(newTetrimino, newPlayfield)
-          newPlayfield = trailHandler.clearSoftdropTrail(newPlayfield)
           newState.playfield = newPlayfield
         } 
 
@@ -132,8 +69,12 @@ export default class FallingExtended extends BasePhase {
         newState.currentGamePhase = 'lock'
       }
 
-      // console.log('newPlayfield continuousFallEvent extended', newPlayfield)
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
+      this.setAppState((prevState) => {
+        return { 
+          ...this.appState, 
+          ...newState
+        }
+      })
       return
     }
 
@@ -146,26 +87,5 @@ export default class FallingExtended extends BasePhase {
 
   }
 
-  continuousLeftOrRight(playerAction: string) {
 
-    if (this.appState.autoRepeatDelayTimeoutId) { 
-      return 
-    }
-
-    const { 
-      newPlayfield, 
-      newTetrimino, 
-      successfulMove
-    } = this.tetriminoMovementHandler
-      .moveOne(playerAction, this.appState.playfield, this.appState.currentTetrimino)
-    
-    if (successfulMove)  {
-      this.setAppState((prevState) => ({ 
-        ...prevState, 
-        currentTetrimino: newTetrimino,
-        playfield: newPlayfield
-      }))
-    }
-  }
-  
 }

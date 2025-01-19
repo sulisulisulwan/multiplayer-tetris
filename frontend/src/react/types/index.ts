@@ -142,6 +142,7 @@ export interface eventDataIF {
   key: string,
   strokeType: string
   action: string
+  currKeystrokes: Set<string>
 }
 
 export interface playerActionHandlersIF {
