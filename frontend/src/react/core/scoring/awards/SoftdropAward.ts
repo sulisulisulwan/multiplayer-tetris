@@ -1,7 +1,7 @@
-import { genericObjectIF } from "../../../types";
+import { GenericObject } from "multiplayer-tetris-types/frontend";
 
 export class SoftdropAward {
-  public calculateScore(currentScore: number, scoringData: genericObjectIF): number {
+  public calculateScore(currentScore: number, scoringData: GenericObject): number {
     return currentScore + 1
   }
 }

@@ -1,17 +1,18 @@
-import { sharedHandlersIF } from "../../../types";
-import BasePhase from "./BasePhase";
+import { AppState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { Dispatch } from "redux";
 
 export default class Off extends BasePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
 
-  execute() {
+  execute(gameState: AppState['gameState'], dispatch: Dispatch) {
     // console.log('>>>> OFF PHASE')
 
-    clearInterval(this.appState.fallIntervalId)
-    clearTimeout(this.appState.lockTimeoutId)
+    clearInterval(gameState.fallIntervalId)
+    clearTimeout(gameState.lockTimeoutId)
   }
 
 }

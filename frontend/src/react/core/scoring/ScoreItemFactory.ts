@@ -1,4 +1,5 @@
-import { appStateIF, genericObjectIF, lineClearPatternDataIF, patternDataIF, patternItemIF, scoreItemIF, sharedHandlersIF } from "../../types"
+import { GenericObject, LineClearPatternDataItem, PatternDataItem, ScoreItem } from "multiplayer-tetris-types/frontend"
+import { AppState } from "multiplayer-tetris-types/frontend/shared"
 
 export default class ScoreItemFactory {
 
@@ -19,58 +20,58 @@ export default class ScoreItemFactory {
     ]) 
   }
 
-  public getItem(type: string, stateData: appStateIF, nonStateData: patternDataIF | null) {
+  public getItem(type: string, gameState: AppState['gameState'], nonStateData?: PatternDataItem | null) {
 
     const scoreItemDataBuilder = this.scoreItemDataMap.get(type)
 
-    const scoreItem: scoreItemIF= {
+    const scoreItem: ScoreItem= {
       type,
-      data: scoreItemDataBuilder(stateData, nonStateData)
+      data: scoreItemDataBuilder(gameState, nonStateData)
     }
 
     return scoreItem
   }
 
-  private buildLineClearData(stateData: appStateIF, patternData: lineClearPatternDataIF) {
-    const { performedTSpinMini, performedTSpin } = stateData
+  private buildLineClearData(gameState: AppState['gameState'], patternData: LineClearPatternDataItem) {
+    const { performedTSpinMini, performedTSpin } = gameState
     const linesCleared = patternData.linesCleared
     const backToBackCondition1 = linesCleared === 4 || (performedTSpin || performedTSpinMini) ? true : false
-    const backToBackCondition2 = stateData.backToBack
+    const backToBackCondition2 = gameState.backToBack
     const backToBack = backToBackCondition1 && backToBackCondition2
     return { 
       linesCleared,
       backToBack,
-      currentLevel: stateData.currentLevel,
-      performedTSpin: stateData.performedTSpin,
-      performedTSpinMini: stateData.performedTSpinMini,
+      currentLevel: gameState.currentLevel,
+      performedTSpin: gameState.performedTSpin,
+      performedTSpinMini: gameState.performedTSpinMini,
     }
 
   }
 
-  private buildSoftdropData(stateData: appStateIF) {
+  private buildSoftdropData(gameState: AppState['gameState']) {
     return { 
-      currentScore: stateData.totalScore 
+      currentScore: gameState.totalScore 
     }
   }
 
-  private buildHarddropData(stateData: appStateIF, data: genericObjectIF) {
+  private buildHarddropData(gameState: AppState['gameState'], data: GenericObject) {
     return { 
-      currentScore: stateData.totalScore,
+      currentScore: gameState.totalScore,
       linesDropped: data.linesDropped
     }
   }
 
-  private buildTSpinNoLineClear(stateData: appStateIF) {
+  private buildTSpinNoLineClear(gameState: AppState['gameState']) {
     return { 
-      currentScore: stateData.totalScore,
-      currentLevel: stateData.currentLevel
+      currentScore: gameState.totalScore,
+      currentLevel: gameState.currentLevel
     }
   }
 
-  private buildTSpinMiniNoLineClear(stateData: appStateIF) {
+  private buildTSpinMiniNoLineClear(gameState: AppState['gameState']) {
     return { 
-      currentScore: stateData.totalScore,
-      currentLevel: stateData.currentLevel
+      currentScore: gameState.totalScore,
+      currentLevel: gameState.currentLevel
     }
   }
 

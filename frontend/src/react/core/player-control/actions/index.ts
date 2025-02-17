@@ -1,15 +1,15 @@
-import actionLeftAndRight from './leftAndRight'
-import actionFlip from './flip'
-import actionSoftdrop from './softdrop'
-import actionHarddrop from './harddrop'
-import actionHold from './hold'
-import actionPauseGame from './pauseGame'
+import ActionLeftAndRight from './ActionLeftAndRight'
+import ActionFlip from './ActionFlip'
+import ActionSoftdrop from './ActionSoftdrop'
+import ActionHarddrop from './ActionHarddrop'
+import ActionHold from './ActionHold'
+import ActionPauseGame from './ActionPauseGame'
 
 export {
-  actionLeftAndRight,
-  actionFlip,
-  actionSoftdrop,
-  actionHarddrop,
-  actionHold,
-  actionPauseGame
+  ActionLeftAndRight,
+  ActionFlip,
+  ActionSoftdrop,
+  ActionHarddrop,
+  ActionHold,
+  ActionPauseGame
 }

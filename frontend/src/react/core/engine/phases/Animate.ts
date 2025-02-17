@@ -1,22 +1,23 @@
-import { appStateIF, sharedHandlersIF } from "../../../types";
-import BasePhase from "./BasePhase";
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState";
+import { Dispatch } from "redux";
 
 export default class Animate extends BasePhase {
   
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
 
-  execute() {
+  execute(_: AppState['gameState'], dispatch: Dispatch) {
     // console.log('>>>> ANIMATE PHASE')
 
     // iterate through all this.appState.patternItems and handle animation execution depending on patternItem.type 
 
-    const newState = {} as appStateIF
-    newState.currentGamePhase = 'eliminate'
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-
-
+    const newGameState = {} as LocalGameState
+    newGameState.currentGamePhase = 'eliminate'
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 }
 

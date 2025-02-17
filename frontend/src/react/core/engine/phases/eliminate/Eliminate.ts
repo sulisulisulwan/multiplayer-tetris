@@ -1,21 +1,19 @@
-import { 
-  appStateIF, 
-  sharedHandlersIF, 
-  eliminatorsIF, 
-  eliminator, 
-  patternItemIF,
-} from "../../../../types";
+
 
 import lineClearEliminator from "./eliminators/lineClear";
-import BasePhase from "../BasePhase";
+import { EliminatorFn, EliminatorsMap, PatternItem, SharedHandlersMap, SingleplayerLocalGameState } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../../redux/reducers/gameState";
 
 
 
 export default class Eliminate extends BasePhase {
   
-  private eliminators: eliminatorsIF
+  private eliminators: EliminatorsMap
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
 
     this.eliminators = {
@@ -23,26 +21,24 @@ export default class Eliminate extends BasePhase {
     }
   }
 
-  public execute() {
+  public execute(gameState: AppState['gameState'], dispatch: Dispatch) {
     // console.log('>>>> ELIMINATE PHASE')
-    const newState = {} as appStateIF
-    const newPlayfield = this.runEliminators()
-    
-    newState.currentGamePhase = 'iterate',
-    newState.playfield = newPlayfield
-
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    const newPlayfield = this.runEliminators(gameState)
+    dispatch(updateMultipleGameStateFields({
+      currentGamePhase: 'iterate',
+      playfield: newPlayfield
+    }))
   }
 
-  private runEliminators() {
+  private runEliminators(gameState: AppState['gameState']) {
 
-    const patternsFound = this.appState.patternItems as patternItemIF[]
-    let newPlayfield = this.appState.playfield
+    const patternsFound = gameState.patternItems as PatternItem[]
+    let newPlayfield = gameState.playfield
 
     patternsFound.forEach(pattern => {
       if (pattern.action === 'eliminate') {
         const { type, data } = pattern
-        const eliminator: eliminator = this.eliminators[type as keyof eliminatorsIF]
+        const eliminator: EliminatorFn = this.eliminators[type as keyof EliminatorsMap]
         newPlayfield = eliminator(newPlayfield, data)
       }
     })

@@ -1,176 +1,175 @@
 import * as React from 'react'
 import { Engine } from './core/engine/Engine'
 
-import { appStateIF, setAppStateIF, soundEffectsIF } from './types'
 import { makeCopy } from './core/utils/utils'
-
-// import { TestPlayfields } from '../__tests__/test-playfields/testPlayfields'
-import { getView } from './getView'
-import { musicConfig, soundEffectsConfig, soundEffectsConfigIF } from './soundEffectsToSet'
-import { getBackgrounds } from './getBackgrounds'
-
-// const newTestPlayfields = new TestPlayfields()
-
-
-class App extends React.Component<{}, appStateIF> {
-
-  readonly backgrounds: { [key: string]: Function }
-  private engine: Engine | null
-  public soundEffects: soundEffectsIF
-  public backgroundMusic: soundEffectsIF
-
-  constructor(props: appStateIF) {
-    super(props)
-    this.state = {
-
-      gameOptions: null,
-      view: 'mainMenu',
-
-      currentTetrimino: null,
-      playfield: this.getInitialPlayfield(),
-      // playfield: newTestPlayfields.backToBackTSpin,
-
-      gameMode: 'classic',
-      nextQueue: null,
-      holdQueue: {
-        swapStatus: 'swapAvailableNow',
-        heldTetrimino: null,
-        available: true
-      },
-
-      currentGamePhase: 'off',
-
-      playerAction: {
-        autoRepeat: {
-          left: false,
-          right: false,
-          override: null,
-        },
-        softdrop: false,
-        harddrop: false,
-        flipClockwise: false,
-        flipCounterClockwise: false,
-        hold: false
-      },
-
-      rightIntervalId: null,
-      leftIntervalId: null,
-      
-      autoRepeatDelayTimeoutId: null,
-      fallIntervalId: null,
-
-      pregameCounter: 1, // This should be 2
-      pregameIntervalId: null,
-
-      lockTimeoutId: null,
-      extendedLockdownMovesRemaining: 15,
-      lowestLockSurfaceRow: null,
-      postLockMode: false,
-
-      currentLevel: 1,
-
-      patternItems: [],
-      scoreItems: [],
-      levelClearedLinesGoal: 5, // this is a fixed goal system
-      fallSpeed: 1000,
-      totalLinesCleared: 0,
-      totalScore: 0,
-      performedTSpin: false,
-      performedTSpinMini: false,
-      backToBack: false,
-      
-      scoringHistoryPerCycle: {},
-
-      // ghostTetriminoOn: false,
-      ghostCoords: []
-    }
-
-    this.backgrounds = getBackgrounds()
-
-    this.startQuitClickHandler = this.startQuitClickHandler.bind(this)
-    this.handlePlayerKeyStroke = this.handlePlayerKeyStroke.bind(this)    
-    this.engine = null
-
-  }
-
-  setEngine() {
-    const gameOptions = makeCopy(this.state.gameOptions)
-    gameOptions.setAppState = this.setState.bind(this) as setAppStateIF
-    this.engine = new Engine(gameOptions)
-  }
-
-  getInitialPlayfield() {
-    const initialPlayfield = new Array(40).fill(null)
-    return initialPlayfield.map(row => new Array(10).fill('[_]', 0, 10))
-  }
-
-  startQuitClickHandler(e: Event): void {
-    e.preventDefault()
-    // may in the future implement "countdown" gamePhase
-    this.state.currentGamePhase === 'off' ?
-      this.setState({ currentGamePhase: 'pregame', }) : this.setState({ currentGamePhase: 'off' })
-  } 
-
-  handlePlayerKeyStroke(e: any) {
-    // e.preventDefault()
-    if (this.state.view === 'gameActive') {
-      this.engine.playerControl.keystrokeHandler(this.state, e)
-    }
-  }
-
-  componentDidMount() {
-    document.addEventListener('keydown', this.handlePlayerKeyStroke, true)
-    document.addEventListener('keyup', this.handlePlayerKeyStroke, true)
-  }
-
-  componentDidUpdate() { 
-
-    if (this.state.view === 'loadGame') {
-      this.setEngine()
-      this.engine.soundEffects.addSoundsToDOM()
-      this.engine.backgroundMusic.addSoundsToDOM()
-      this.engine.backgroundMusic.setTrack(this.state.gameOptions.backgroundMusic)
-      this.setState({ 
-        currentLevel: this.state.gameOptions.startingLevel,
-        view: 'gameActive'
-      })
-    }
-
-    if (this.state.view === 'gameActive') {
-      this.engine.handleGameStateUpdate(this.state)
-    }
-
-  }
-
-  setMusic() {
-    this.engine
-  }
-
-  setBackground(view: string): void {
-    let activateBackground = this.backgrounds[view]
-    activateBackground()
-  }
-
-  getView() {
-    const getter = getView.bind(this)
-    return getter()
-  }
-
-  render() {
+import { getView } from './allGetsAndSets/getView'
+import { getBackgrounds } from './allGetsAndSets/getBackgrounds'  
+import ChatWindow from './ui/components/Chat/ChatWindow'
+import MenuPlayerControl from './core/player-control/MenuPlayerControl' 
+import DgramBrowser from './sockets/dgram/DgramBrowser' 
+import contentEqual from '../utils/contentEqual' 
+import WebsocketBrowser from './sockets/websocket/WebsocketBrowser' 
+import { AppState } from '../../../types/frontend/shared'
+import SoundEffects from './core/audio/SoundEffects'
+import { useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
+import { getUserState } from './redux/reducers/user'
+import { getViewState } from './redux/reducers/view'
+import { getGameState, initializeSinglePlayerGame } from './redux/reducers/gameState'
+import { SocketDataItem } from 'multiplayer-tetris-types'
+import { allSoundEffects } from './core/audio/allSoundEffects'
+import BackgroundMusic from './core/audio/BackgroundMusic'
+import { allBackgroundMusic } from './core/audio/allBackgroundMusic'
+import { Dispatch } from 'redux'
+import { getMultiplayerGameState } from './redux/reducers/multiplayerGameState'
+import { getPartyState } from './redux/reducers/party'
     
-    // We need a better way to call setBackground.  What if we want to change it, say, when the player levels up?
-    if (this.state.currentGamePhase === 'off') {
-      this.setBackground(this.state.view)
+type AppStateSlices = {
+  view: AppState['view'],
+  gameState: AppState['gameState'],
+  user: AppState['user'],
+  party: AppState['party']
+  multiplayerGameState: AppState['multiplayerGameState']
+}
+type AppTestProps = {
+  thisUserId?: string // 
+}
+
+type BackgroundsGetter = {
+  gameActive: () => void;
+  mainMenu: () => void;
+  singleplayer: () => void;
+  multiplayer: () => void;
+  singleplayer_options: () => string;
+  singleplayer_highscore: () => string;
+  singleplayer_help: () => string;
+  highScore: () => string;
+  help: () => string;
+  loadGame: () => string;
+}
+
+let engine: Engine | null = null
+let soundEffects: SoundEffects = null
+  export { soundEffects }
+let backgroundMusic: BackgroundMusic = null
+  export { backgroundMusic }
+let backgrounds: BackgroundsGetter = getBackgrounds()
+let menuPlayerControl: MenuPlayerControl = null
+let userState: AppState['user'] = null
+let viewState: AppState['view'] = null
+let gameState: AppState['gameState'] = null
+let partyState: AppState['party'] = null
+let multiplayerGameState: AppState['multiplayerGameState'] = null
+let dispatch: Dispatch = null
+let currKeyStrokeHandler: (e: KeyboardEvent) => void = null
+
+let inGameHandleKeyStroke = (e: any) => {
+  engine.inGamePlayerControl.keystrokeHandler(gameState, dispatch, e)
+}
+let mainMenuHandleKeyStroke = (e: any) => {
+  menuPlayerControl.keystrokeHandler(null, e)
+}
+
+WebsocketBrowser.onMessage((msg: SocketDataItem<any>) => {
+  console.log(`Receiving message "${msg.action}" from server`)
+  const handler = WebsocketBrowser.getHandler(msg.action)  
+  
+  let state = {}
+  if (['updateFriendsData', 'playerDisconnected'].includes(msg.action)) {
+    state = { user: userState }
+  }
+
+  handler({
+    appState: state,
+    socketSend: WebsocketBrowser.send.bind(WebsocketBrowser),
+    msgData: msg.data
+  })  
+})
+
+
+
+const App = React.memo((props: AppTestProps) => {
+  userState = useSelector(getUserState)
+  viewState = useSelector(getViewState)
+  gameState = useSelector(getGameState)
+  partyState = useSelector(getPartyState)
+  multiplayerGameState = useSelector(getMultiplayerGameState)
+
+  const state: AppStateSlices = {
+    user: userState,
+    view: viewState,
+    party: partyState,
+    gameState: gameState,
+    multiplayerGameState: multiplayerGameState
+  }
+
+  const { thisUserId } = props
+  dispatch = useDispatch()
+  
+  React.useEffect(() => {
+
+    if (viewState === 'mainMenu') {
+      document.removeEventListener('keyup', currKeyStrokeHandler)
+      document.removeEventListener('keydown', currKeyStrokeHandler)
+      currKeyStrokeHandler = mainMenuHandleKeyStroke
+      document.addEventListener('keydown', currKeyStrokeHandler, true)
+      document.addEventListener('keyup', currKeyStrokeHandler, true)
     }
     
-    return (
-      <div>
-        { this.getView() }
-      </div>
-    )
-  }
-} 
+    if (viewState === 'loadGame') {
+      document.removeEventListener('keyup', currKeyStrokeHandler)
+      document.removeEventListener('keydown', currKeyStrokeHandler)
+      currKeyStrokeHandler = inGameHandleKeyStroke
+      document.addEventListener('keydown', currKeyStrokeHandler, true)
+      document.addEventListener('keyup', currKeyStrokeHandler, true)
+      const gameOptions = makeCopy(gameState.gameOptions)
+      engine = new Engine(gameOptions)
+      backgroundMusic.setTrack(gameState.gameOptions.backgroundMusic)
+      dispatch(initializeSinglePlayerGame())
+      return
+    }
+
+    backgrounds[viewState as keyof BackgroundsGetter]()
+  }, [viewState])
 
 
+
+  React.useEffect(() => {
+    if (viewState === 'gameActive') {
+      engine.handleGameStateUpdate(gameState, dispatch)
+    }
+  }, [gameState])
+
+
+  //componentDidMount
+  React.useEffect(() => {
+    currKeyStrokeHandler = mainMenuHandleKeyStroke
+    document.addEventListener('keydown', currKeyStrokeHandler, true)
+    document.addEventListener('keyup', currKeyStrokeHandler, true)
+    menuPlayerControl = new MenuPlayerControl(null)
+    WebsocketBrowser.init(thisUserId)
+    WebsocketBrowser.setReduxDispatcher(dispatch)
+    soundEffects = new SoundEffects(allSoundEffects, 'sound-effects').addSoundsToDOM()
+    backgroundMusic = new BackgroundMusic(allBackgroundMusic, 'background-music').addSoundsToDOM()
+    return () => {
+      WebsocketBrowser.kill()
+    }
+  }, [])
+
+  console.log(state)
+  
+  return (
+    <>
+      {
+        (function(viewState) {
+          const view = getView(viewState)
+          return view 
+        })(viewState)
+      }
+      { userState ? <ChatWindow/> : null}
+    </>
+  )
+      
+}, (props, nextProps) => true)
 
 export default App

@@ -1,98 +1,37 @@
-import { makeCopy } from "../../../utils/utils";
-import { appStateIF, sharedHandlersIF, tetriminoIF } from "../../../../types";
-import TetriminoActivePhase from "../TetriminoActivePhase";
+import { AppState, LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import trail from "../../../tetrimino/trail/Trail";
+import Lock from "./Lock";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../../redux/reducers/gameState";
 
-export default class LockClassic extends TetriminoActivePhase {
+export default class LockClassic extends Lock {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
 
-  execute() {
-    let newState = {} as appStateIF
+  public execute(gameState: AppState['gameState'], dispatch: Dispatch) {
+    this.currGameState = gameState
+    let newGameState = {} as LocalGameState
+
+    if (trail.trailExists(gameState.playfield)) {
+      newGameState.playfieldOverlay = trail.clearSoftdropTrail(gameState.playfieldOverlay)
+    }
+    
 
     // If at the beginning of the lockdown phase (lockTimeout hasn't been set), set the lockdown timer
-    if (!this.appState.lockTimeoutId) {
-      newState.lockTimeoutId = setTimeout(this.lockDownTimeout.bind(this), 500)
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
+    if (!gameState.lockTimeoutId) {
+      newGameState.lockTimeoutId = setTimeout(this.lockDownTimeout.bind(this), 500, dispatch)
+      return dispatch(updateMultipleGameStateFields({ ...newGameState }))
     }
 
     // Lockdown timer had already been set, so check if player has positioned the tetrimino to escape lock phase
-    const tetriminoCopy = makeCopy(this.appState.currentTetrimino)
-    const playfieldCopy = makeCopy(this.appState.playfield)
-
-    const oldCoordsOnPlayfield = this.tetriminoMovementHandler.getPlayfieldCoords(tetriminoCopy)
-    const targetCoordsOnPlayfield = this.tetriminoMovementHandler.getPlayfieldCoords(tetriminoCopy, 'down')
-    const playfieldNoTetrimino = this.tetriminoMovementHandler.removeTetriminoFromPlayfield(oldCoordsOnPlayfield, playfieldCopy)
-    const targetCoordsClear = this.tetriminoMovementHandler.gridCoordsAreClear(targetCoordsOnPlayfield, playfieldNoTetrimino)
-
-    //If tetrimino can fall, cancel the lockdown timer and enter Fall phase
-    if (targetCoordsClear) {
-      clearTimeout(this.appState.lockTimeoutId)
-      newState.currentGamePhase = 'falling'
-      newState.lockTimeoutId = null
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
-    }
-
+    // If tetrimino can fall, cancel the lockdown timer and enter Fall phase
+    if (this.tetriminoCanFall(gameState)) return this.regressToFallingPhase(gameState, dispatch, newGameState)
+    
     // Otherwise, the lockdown timer is still ticking... Handle autorepeat player motions..
-    newState = this.handleAutorepeatActions(newState)
-
-    if (Object.keys(newState).length === 0) return
-    
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-
-  }
-
-
-  lockDownTimeout() {
-
-    // Lockdown timer has run out, so we clear the timer..
-    clearTimeout(this.appState.lockTimeoutId)
-
-    const tetriminoCopy = makeCopy(this.appState.currentTetrimino)
-    const playfieldCopy = makeCopy(this.appState.playfield)
-    
-    const newState = {} as appStateIF
-    newState.currentTetrimino = tetriminoCopy
-    newState.lockTimeoutId = null
-    newState.playfield = this.appState.playfield
-
-    // Final check if tetrimino should be granted falling status before permanent lock
-    const oldCoordsOnPlayfield = this.tetriminoMovementHandler.getPlayfieldCoords(tetriminoCopy)
-    const targetCoordsOnPlayfield = this.tetriminoMovementHandler.getPlayfieldCoords(tetriminoCopy, 'down')
-    const playfieldNoTetrimino = this.tetriminoMovementHandler.removeTetriminoFromPlayfield(oldCoordsOnPlayfield, playfieldCopy)
-    const targetCoordsClear = this.tetriminoMovementHandler.gridCoordsAreClear(targetCoordsOnPlayfield, playfieldNoTetrimino)
-
-    if (targetCoordsClear) {
-      // Grant falling status if there is no surface below.
-      newState.currentGamePhase = 'falling',
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
-    }
-
-    newState.currentTetrimino.status = 'locked'
-    this.soundEffects.play('tetriminoLand')
-    
-    if (this.gameIsOver(tetriminoCopy)) {
-      clearTimeout(this.appState.lockTimeoutId)
-      newState.lockTimeoutId = null
-      newState.currentGamePhase = 'gameOver'
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
-    }
-
-    newState.currentGamePhase = 'pattern',
-    newState.postLockMode = false
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
-  }
-
-  gameIsOver(currentTetrimino: tetriminoIF) {
-    // Lock out - A whole tetrimino locks down above skyline
-    const lowestPlayfieldRowOfTetrimino = this.tetriminoMovementHandler.getLowestPlayfieldRowOfTetrimino(currentTetrimino)
-    const gameIsOver = lowestPlayfieldRowOfTetrimino < 20 ? true : false
-    return gameIsOver
+    newGameState = this.handleAutorepeatActions(gameState, dispatch, newGameState)
+    Object.keys(newGameState).length === 0 ? null : dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
 }

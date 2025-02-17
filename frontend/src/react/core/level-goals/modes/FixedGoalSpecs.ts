@@ -1,4 +1,6 @@
-export class FixedGoalSpecs {
+import { GoalSpecs as GoalSpecsAbstract} from "multiplayer-tetris-types/frontend/core"
+
+export class FixedGoalSpecs implements GoalSpecsAbstract {
 
   private clearedLinesGoals: Map<number, number>
 

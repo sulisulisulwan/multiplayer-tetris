@@ -1,6 +1,8 @@
-import { appStateIF, eventDataIF } from "../../types"
+import { EventData, HoldQueue as HoldQueueAbstract } from "multiplayer-tetris-types/frontend/core"
+import { AppState } from "multiplayer-tetris-types/frontend/shared"
 
-export class HoldQueue {
+
+export class HoldQueue implements HoldQueueAbstract {
 
   private holdQueueState: {}
 
@@ -8,14 +10,11 @@ export class HoldQueue {
     this.holdQueueState = {}
   }
 
-  setHoldQueueState(state: appStateIF) {
-    this.holdQueueState = state.holdQueue
+  public setHoldQueueState(gameState: AppState['gameState']) {
+    this.holdQueueState = gameState.holdQueue
   }
 
-  handleHoldQueueToggle(appState: appStateIF, eventData: eventDataIF) {
-    this.setHoldQueueState(appState)
-    console.log('this runss')
-    
-
+  public handleHoldQueueToggle(gameState: AppState['gameState'], eventData: EventData) {
+    this.setHoldQueueState(gameState)
   }
 }

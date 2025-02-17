@@ -1,13 +1,19 @@
 
-import { appStateIF, sharedHandlersIF } from "../../../../types";
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import trail from "../../../tetrimino/trail/Trail";
 import TetriminoActivePhase from "../TetriminoActivePhase";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../../redux/reducers/gameState";
 
 export default abstract class FallingPhase extends TetriminoActivePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
-    super(sharedHandlers)
-  }
+  protected currGameState: AppState['gameState']
 
+  constructor(sharedHandlers: SharedHandlersMap) {
+    super(sharedHandlers)
+    this.currGameState = null
+  }
 
   /**
    * Will re-trigger when:
@@ -16,29 +22,31 @@ export default abstract class FallingPhase extends TetriminoActivePhase {
    * -  
    */
 
-  public execute(): void {
-    // console.log('>>>> FALLING PHASE')
-    let newState = {} as appStateIF
+  public execute(gameState: AppState['gameState'], dispatch: Dispatch): void {
+    this.currGameState = gameState
+    let newGameState = {} as LocalGameState
 
     // If entering Falling phase, set intervallic fall event
-    if (this.appState.fallIntervalId === null) {
-      (newState.fallIntervalId as any) = this.setContinuousFallEvent() //TODO: fix types
+    if (gameState.fallIntervalId === null) {
+      if (!gameState.playerAction.softdrop) {
+        newGameState.playfieldOverlay = trail.clearSoftdropTrail(gameState.playfieldOverlay)
+      }
+      (newGameState.fallIntervalId as any) = this.setContinuousFallEvent(gameState, dispatch) 
     }
 
     // Handle autorepeat player actions
-    newState = this.handleAutorepeatActions(newState)
+    newGameState = this.handleAutorepeatActions(gameState, dispatch, newGameState)
 
     // If state hasn't changed, don't set state.
-    if (Object.keys(newState).length === 0) return
-  
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
 
+    if (Object.keys(newGameState).length === 0) return
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
-  setContinuousFallEvent(): NodeJS.Timer {
-    return setInterval(this.continuousFallEvent.bind(this), this.appState.fallSpeed)
+  setContinuousFallEvent(gameState: AppState['gameState'], dispatch: Dispatch): NodeJS.Timer {
+    return setInterval(this.continuousFallEvent.bind(this), gameState.fallSpeed, dispatch)
   }
 
-  protected abstract continuousFallEvent(): void
+  protected abstract continuousFallEvent(dispatch: Dispatch): void
 }
 

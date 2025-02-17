@@ -1,12 +1,12 @@
-import { coordinates, genericObjectIF } from "../../types"
+import { Coordinates, GenericObject } from "multiplayer-tetris-types/frontend"
 
 const makeCopy = (objOrArray: object) => {
 
   if (Array.isArray(objOrArray)) {
-    const obj: genericObjectIF = {} 
+    const obj: GenericObject = {} 
 
     objOrArray.forEach((row: string[], i: number) => {
-      obj[i as keyof genericObjectIF] = {}
+      obj[i as keyof GenericObject] = {}
       row.forEach((square: string, j: number) => {
         obj[i][j] = square
       })
@@ -35,8 +35,8 @@ const makeCopy = (objOrArray: object) => {
   // return JSON.parse(JSON.stringify(objOrArray))
 }
 
-const offsetCoordsToLineBelow = (currentCoords: coordinates[]) => {
-  return currentCoords.map((coord: coordinates) => {
+const offsetCoordsToLineBelow = (currentCoords: Coordinates[]) => {
+  return currentCoords.map((coord: Coordinates) => {
     return [coord[0] + 1, coord[1]]
   })
 }

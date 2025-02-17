@@ -1,7 +1,6 @@
-import { tetriminoIF } from "../../types"
+import { Tetrimino } from "multiplayer-tetris-types"
 
-
-type factoryFuncs = {
+type FactoryFuncs = {
   getITetrimino: Function,
   getOTetrimino: Function,
   getTTetrimino: Function,
@@ -15,7 +14,7 @@ type factoryFuncs = {
 export class TetriminoFactory {
 
 
-  private static factoryFunctions: factoryFuncs = {
+  private static factoryFunctions: FactoryFuncs = {
     getITetrimino: TetriminoFactory.getITetrimino,
     getOTetrimino: TetriminoFactory.getOTetrimino,
     getTTetrimino: TetriminoFactory.getTTetrimino,
@@ -25,7 +24,7 @@ export class TetriminoFactory {
     getZTetrimino: TetriminoFactory.getZTetrimino
   }
 
-  private static getBaseTetrimino(): tetriminoIF {
+  private static getBaseTetrimino(): Tetrimino {
     return {
       startingGridPosition: [18, 2],
       currentOriginOnPlayfield: [18, 2],
@@ -36,17 +35,17 @@ export class TetriminoFactory {
     }
   }
 
-  public static getTetrimino(tetrimino: string): tetriminoIF {
+  public static getTetrimino(tetrimino: string): Tetrimino {
     const factoryFunc = `get${tetrimino}`
 
-    return TetriminoFactory.factoryFunctions[factoryFunc as keyof factoryFuncs]()
+    return TetriminoFactory.factoryFunctions[factoryFunc as keyof FactoryFuncs]()
   }
 
-  public static resetTetrimino(tetrimino: tetriminoIF) {
+  public static resetTetrimino(tetrimino: Tetrimino) {
     return TetriminoFactory.getTetrimino(tetrimino.name)
   }
   
-  protected static getITetrimino(): tetriminoIF {
+  protected static getITetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'ITetrimino'
     tetrimino.minoGraphic = '[i]'
@@ -115,7 +114,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getOTetrimino(): tetriminoIF {
+  protected static getOTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'OTetrimino'
     tetrimino.minoGraphic = '[o]',
@@ -179,7 +178,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getJTetrimino(): tetriminoIF {
+  protected static getJTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'JTetrimino'
     tetrimino.minoGraphic = '[j]'
@@ -241,7 +240,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getLTetrimino(): tetriminoIF {
+  protected static getLTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'LTetrimino'
     tetrimino.minoGraphic = '[l]'
@@ -303,7 +302,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getSTetrimino(): tetriminoIF {
+  protected static getSTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'STetrimino'
     tetrimino.minoGraphic = '[s]'
@@ -365,7 +364,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getZTetrimino(): tetriminoIF {
+  protected static getZTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'ZTetrimino'
     tetrimino.minoGraphic = '[z]'
@@ -427,7 +426,7 @@ export class TetriminoFactory {
     return tetrimino
   }
 
-  protected static getTTetrimino(): tetriminoIF {
+  protected static getTTetrimino(): Tetrimino {
     const tetrimino = TetriminoFactory.getBaseTetrimino()
     tetrimino.name = 'TTetrimino'
     tetrimino.minoGraphic = '[t]'

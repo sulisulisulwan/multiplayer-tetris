@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+      {
+          "label": "suli",
+          "type": "shell",
+          "command": "echo Hello World",
+      },
+      {
+          "label": "wuli",
+          "type": "shell",
+          "command": "node; 1 + 1",
+      },
+  ]
+}

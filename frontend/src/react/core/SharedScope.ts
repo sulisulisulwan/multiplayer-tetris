@@ -1,45 +1,37 @@
-import { appStateIF, setAppStateIF, sharedHandlersIF, soundEffectsIF } from "../types"
-import { allBackgroundMusic } from "./audio/allBackgroundMusic"
-import { allSoundEffects } from "./audio/allSoundEffects"
-import BackgroundMusic from "./audio/Music"
-import SoundEffects from "./audio/SoundEffects"
-import { HoldQueue } from "./hold-queue/HoldQueue"
-import { LevelGoals } from "./level-goals/LevelGoals"
-import { NextQueue } from "./next-queue/NextQueue"
-import { BaseScoringHandler } from "./scoring/modes/BaseScoringHandler"
-import { TetriminoMovementHandler } from "./tetrimino/movement-handler/TetriminoMovementHandler"
-import { TetriminoFactory } from './tetrimino/TetriminoFactory'
+import { SharedHandlersMap } from "multiplayer-tetris-types/frontend"
+import { 
+  HoldQueue as HoldQueueAbstract,
+  LevelGoals as LevelGoalsAbstract, 
+  NextQueue as NextQueueAbstract, 
+  TetriminoMovementHandler as TetriminoMovementHandlerAbstract,
+  BackgroundMusic as BackgroundMusicAbstract,
+  SoundEffects as SoundEffectsAbstract
+} from "multiplayer-tetris-types/frontend/core"
+import { AppState, SetAppState } from "multiplayer-tetris-types/frontend/shared"
+import { BaseScoringHandler } from "multiplayer-tetris-types/frontend/core"
 import { makeCopy } from "./utils/utils"
+
 export class SharedScope {
 
   public scoringHandler: BaseScoringHandler
-  public levelGoalsHandler: LevelGoals
-  public tetriminoMovementHandler: TetriminoMovementHandler
-  public tetriminoFactory: TetriminoFactory
-  public nextQueueHandler: NextQueue
-  public holdQueueHandler: HoldQueue
-  public setAppState: setAppStateIF
-  public appState: appStateIF
-  public soundEffects: SoundEffects
-  public backgroundMusic: BackgroundMusic
+  public levelGoalsHandler: LevelGoalsAbstract
+  public tetriminoMovementHandler: TetriminoMovementHandlerAbstract
+  public nextQueueHandler: NextQueueAbstract
+  public holdQueueHandler: HoldQueueAbstract
 
-
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     this.scoringHandler = sharedHandlers.scoringHandler
     this.levelGoalsHandler = sharedHandlers.levelGoalsHandler
     this.tetriminoMovementHandler = sharedHandlers.tetriminoMovementHandler
-    this.tetriminoFactory = TetriminoFactory
     this.nextQueueHandler = sharedHandlers.nextQueueHandler
     this.holdQueueHandler = sharedHandlers.holdQueueHandler
-    this.setAppState = sharedHandlers.setAppState
-    this.appState = null
-    this.soundEffects = sharedHandlers.soundEffects 
-    this.backgroundMusic = sharedHandlers.backgroundMusic 
   }
 
-  syncToReactAppState(appState: appStateIF) {
-    const appStateCopy = makeCopy(appState) as appStateIF
-    this.appState = appStateCopy
-  }
+  
+
+  // public syncToReactAppState(appState: AppState) {
+  //   const appStateCopy = makeCopy(appState) as AppState
+  //   this.appState = appStateCopy
+  // }
 
 }

@@ -1,8 +1,8 @@
-import { patternItemIF, appStateIF } from "../../../../../types"
+import { AppState, PatternItem } from "multiplayer-tetris-types/frontend"
 
-export default function lineClear(): patternItemIF | null {
+export default function lineClear(gameState: AppState['gameState']): PatternItem | null {
   const rowsToClear: number[] = []
-  const { playfield } = this.appState as appStateIF
+  const { playfield } = gameState
 
   playfield.forEach((row, index) => {
     if (row.every(square => square !== '[_]')) {
@@ -10,7 +10,7 @@ export default function lineClear(): patternItemIF | null {
     }
   })
 
-  let lineClearPatternItem: patternItemIF | null = null
+  let lineClearPatternItem: PatternItem | null = null
 
   if (rowsToClear.length) {
     lineClearPatternItem = {
@@ -19,7 +19,7 @@ export default function lineClear(): patternItemIF | null {
       stateUpdate: [
         {
           field: 'totalLinesCleared',
-          value: rowsToClear.length + this.appState.totalLinesCleared
+          value: rowsToClear.length + this.appState.gameState.totalLinesCleared
         }
       ],
       data: {
@@ -28,6 +28,7 @@ export default function lineClear(): patternItemIF | null {
       }
     }  
   }
+
 
   return lineClearPatternItem
 }

@@ -1,19 +1,17 @@
-import { appStateIF, sharedHandlersIF } from "../../../types"
-import BasePhase from "./BasePhase"
+import { SharedHandlersMap } from "multiplayer-tetris-types/frontend"
+import { BasePhase } from "multiplayer-tetris-types/frontend/core"
+import { AppState } from "multiplayer-tetris-types/frontend/shared"
+import { Dispatch } from "redux"
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState"
 
 export default class GameOver extends BasePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
   
-  execute() {
-    // console.log('>>>> GAME OVER')
-
-    const newState = {} as appStateIF
-    // newState.currentGamePhase = 'gameover'
-    // this.setAppState((prevState) => ({ ...prevState, ...newState}))
-
+  execute(gameState: AppState['gameState'], dispatch: Dispatch) {
+    console.log('>>>> GAME OVER')
   }
 
 }

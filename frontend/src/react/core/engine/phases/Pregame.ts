@@ -1,39 +1,51 @@
-import { appStateIF, sharedHandlersIF } from "../../../types";
-import BasePhase from "./BasePhase";
-
-
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState";
+import { backgroundMusic } from "../../../App";
 
 export default class Pregame extends BasePhase {
   
-  constructor(sharedHandlers: sharedHandlersIF) {
+  protected pregameCounter: number
+  protected pregameIntervalId: any
+
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
+    this.pregameCounter = null
+    this.pregameIntervalId = null
   }
 
   // TODO: This phase should load in all of the options. Take into account default options
-  execute() {
-    // console.log('>>> PREGAME PHASE')
-    if (this.appState.pregameIntervalId === null) {
-      const newState = {} as appStateIF
-
-      this.backgroundMusic.play()
-
-      newState.pregameIntervalId = setInterval(this.pregameIntervalEvent.bind(this), 0)
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-    }
+  execute(gameState: AppState['gameState'], dispatch: Dispatch<any>) {
+    
+    if (gameState.pregameIntervalId === null) {
+      this.pregameCounter = gameState.pregameCounter
+      const newGameState = {} as LocalGameState
+      backgroundMusic.play()
+      this.pregameIntervalId = setInterval(this.pregameIntervalEvent.bind(this), 1000, 
+      dispatch)
       
+      const { levelClearedLinesGoal, fallSpeed } = this.levelGoalsHandler.getNewLevelSpecs(gameState.currentLevel, 0)
+      newGameState.levelClearedLinesGoal = levelClearedLinesGoal
+      newGameState.fallSpeed = fallSpeed
+      newGameState.pregameIntervalId = this.pregameIntervalId
+      dispatch(updateMultipleGameStateFields({ ...newGameState }))
+    }
   }
 
-  pregameIntervalEvent() {
-    const newState = {} as appStateIF
-    if (this.appState.pregameCounter === 1) {
-      clearInterval(this.appState.pregameIntervalId)
-      newState.pregameIntervalId = null
-      newState.currentGamePhase = 'generation'
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
+  protected pregameIntervalEvent(
+    dispatch: Dispatch) {
+    const newGameState = {} as LocalGameState
+    if (this.pregameCounter === 0) {
+      clearInterval(this.pregameIntervalId)
+      newGameState.pregameIntervalId = null
+      newGameState.currentGamePhase = 'generation' 
+      return dispatch(updateMultipleGameStateFields({ ...newGameState }))
     }
-    newState.pregameCounter = this.appState.pregameCounter - 1
-    
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    this.pregameCounter--
+    newGameState.pregameCounter = this.pregameCounter
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
 }

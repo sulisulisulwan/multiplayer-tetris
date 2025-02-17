@@ -1,5 +1,5 @@
-import { genericObjectIF } from "../../../types";
+import { GenericObject } from "multiplayer-tetris-types/frontend";
 
 export abstract class BaseAward {
-  public abstract calculateScore(currentScore: number, scoringData: genericObjectIF): number
+  public abstract calculateScore(currentScore: number, scoringData: GenericObject): number
 }

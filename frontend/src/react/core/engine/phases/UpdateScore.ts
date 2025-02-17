@@ -1,66 +1,69 @@
-import { appStateIF, genericObjectIF, scoreItemIF, sharedHandlersIF } from "../../../types";
-import BasePhase from "./BasePhase";
 import ScoreItemFactory from "../../scoring/ScoreItemFactory";
+import { AppState, GenericObject, LocalGameState, ScoreItem, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { soundEffects } from "../../../App";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState";
 
 export default class UpdateScore extends BasePhase {
 
   private scoreItemFactory: ScoreItemFactory
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
     this.scoreItemFactory = new ScoreItemFactory()
   }
 
-  public execute() {
-    let newState = {} as appStateIF
-    const newTotalScore = this.accrueScoreAndScoreHistory()
+  public execute(gameState: AppState['gameState'], dispatch: Dispatch) {
+    let newGameState = {} as LocalGameState
+    const newTotalScore = this.accrueScoreAndScoreHistory(gameState)
 
-    if (this.appState.totalLinesCleared >= this.appState.levelClearedLinesGoal) {
-      this.promoteLevel(newState)
+    if (gameState.totalLinesCleared >= gameState.levelClearedLinesGoal) {
+      this.promoteLevel(gameState, newGameState)
     }
 
-    newState.scoreItems = []
-    newState.totalScore = newTotalScore
-    newState.currentGamePhase = 'animate'
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    newGameState.scoreItems = []
+    newGameState.totalScore = newTotalScore
+    newGameState.currentGamePhase = 'animate'
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
 
   }
 
-  private accrueScoreAndScoreHistory() {
-    const { scoreItems, scoreHistory } = this.getScoreItemsFromPatterns()
-    const newTotalScore = this.scoringHandler.handleCompletionPhaseAccrual(this.appState.totalScore, scoreItems, scoreHistory)
+  private accrueScoreAndScoreHistory(gameState: AppState['gameState']) {
+    const { scoreItems, scoreHistory } = this.getScoreItemsFromPatterns(gameState)
+    const newTotalScore = this.scoringHandler.handleCompletionPhaseAccrual(gameState.totalScore, scoreItems, scoreHistory)
     return newTotalScore
   }
 
-  private getScoreItemsFromPatterns() {
-    const scoreItems = [] as scoreItemIF[]
-    const { patternItems } = this.appState
+  private getScoreItemsFromPatterns(gameState: AppState['gameState']) {
+    const scoreItems = [] as ScoreItem[]
+    const { patternItems } = gameState
 
-    const scoreHistory: genericObjectIF = {}
+    const scoreHistory: GenericObject = {}
 
-    patternItems.forEach(pattern => {
+    patternItems.forEach((pattern: any) => {
       const { type, data } = pattern
-      scoreItems.push(this.scoreItemFactory.getItem(type, this.appState, data))
-      scoreHistory[type as keyof genericObjectIF] = true
+      scoreItems.push(this.scoreItemFactory.getItem(type, gameState, data))
+      scoreHistory[type as keyof GenericObject] = true
     })
 
     return { scoreItems, scoreHistory}
   }
 
-  private promoteLevel(newState: appStateIF) {
-    const newLevel = this.appState.currentLevel + 1
+  private promoteLevel(gameState: AppState['gameState'], newGameState: LocalGameState) {
+    const newLevel = gameState.currentLevel + 1
     const { 
       levelClearedLinesGoal, 
       fallSpeed 
-    } = this.levelGoalsHandler.getNewLevelSpecs(newLevel, this.appState.totalLinesCleared)
+    } = this.levelGoalsHandler.getNewLevelSpecs(newLevel, gameState.totalLinesCleared)
     
-    this.soundEffects.play('levelUp')
+    soundEffects.play('levelUp')
 
-    newState.currentLevel = newLevel
-    newState.levelClearedLinesGoal = levelClearedLinesGoal
-    newState.fallSpeed = fallSpeed
-    newState.playerAction = this.appState.playerAction
-    newState.playerAction.softdrop = false // Fixes math bug for softdrop where button trigger bleeds over to generation phase through level promotion
+    newGameState.currentLevel = newLevel
+    newGameState.levelClearedLinesGoal = levelClearedLinesGoal
+    newGameState.fallSpeed = fallSpeed
+    newGameState.playerAction = gameState.playerAction
+    newGameState.playerAction.softdrop = false // Fixes math bug for softdrop where button trigger bleeds over to generation phase through level promotion
   }
 
 }

@@ -1,4 +1,4 @@
-import { orientationsIF, tetriminoIF } from "../../../types"
+import { OrientationsMap, Tetrimino } from "multiplayer-tetris-types"
 import { QueueList } from "../../next-queue/QueueList"
 import { makeCopy } from "../../utils/utils"
 
@@ -19,7 +19,7 @@ class Trail {
     this.trailQueue = new QueueList()
   }
 
-  public addToSoftdropTrail(tetrimino: tetriminoIF, playfield: string[][]) {
+  public addToSoftdropTrail(tetrimino: Tetrimino, playfield: string[][]) {
 
     const queueLength = this.trailQueue.getLength()
     let toDiscard: number[][] = null
@@ -34,24 +34,42 @@ class Trail {
   }
 
   public clearSoftdropTrail(playfield: string[][]) {
-    // const toDiscard = this.trailQueue.queueToArray(this.softdropTrailMax)
-    // this.trailQueue.clearQueue()
-
-    return playfield
-    // return this.removeTrailFromPlayfield(playfield, toDiscard)
+    const toDiscard = this.trailQueue.queueToArray(this.softdropTrailMax)
+    this.trailQueue.clearQueue()
+    const playfieldCopy = makeCopy(playfield)
+    return this.removeTrailFromPlayfield(playfieldCopy, toDiscard)
   }
 
-  removeTrailFromPlayfield(playfield: string[][], toDiscard: number[][][]) {
-    toDiscard?.forEach((trailRow: number[][]) => {
-      trailRow.forEach((coord) => {
-        const [row, col] = coord
-        playfield[row][col] = '[_]'
+  public trailExists(playfield: string[][]): boolean {
+    return playfield.some((row) => {
+      return row.some((column) => {
+        return (column.includes('-'))
       })
     })
   }
 
-  protected getTetriminoTopBorderCoords(tetrimino: tetriminoIF): number[][] {
-    const tetriminoCoords = tetrimino.orientations[tetrimino.currentOrientation as keyof orientationsIF]
+  removeTrailFromPlayfield(playfield: string[][], toDiscard: number[][][]) {
+    const newPlayfield = playfield.map((row) => {
+      return row.map((column) => {
+        if (column.includes('-')) {
+          return '[_]'
+        }
+        return column
+      })
+    })
+    return newPlayfield
+
+    // toDiscard?.forEach((trailRow: number[][]) => {
+    //   trailRow.forEach((coord) => {
+    //     const [row, col] = coord
+    //     playfield[row][col] = '[_]'
+    //   })
+    // })
+    return playfield
+  }
+
+  protected getTetriminoTopBorderCoords(tetrimino: Tetrimino): number[][] {
+    const tetriminoCoords = tetrimino.orientations[tetrimino.currentOrientation as keyof OrientationsMap]
     const originCoords = tetrimino.currentOriginOnPlayfield
     const [originRow, originColumn] = originCoords
     const tetriminoTopBorderPlayfieldCoords = tetriminoCoords.topBorderCoords.map((coords) => {
@@ -78,7 +96,7 @@ class Trail {
     return playfield
   }
 
-  getTetrimonioCssClass(tetrimonio: tetriminoIF) {
+  getTetrimonioCssClass(tetrimonio: Tetrimino) {
     return `${tetrimonio.minoGraphic[1]}Tet`
   }
 

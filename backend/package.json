@@ -1,0 +1,31 @@
+{
+  "name": "chatserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon ./dist/index.js",
+    "startchrome": "node --inspect ./dist/index.js",
+    "build": "tsc --watch",
+    "checkRooms": "curl -s http://localhost:3002/rooms | json_pp",
+    "checkPartys": "curl -s http://localhost:3002/rooms?roomType=party | json_pp",
+    "checkSulwaaan": "curl -s http://localhost:3002/users?userId=5U11W44N | json_pp",
+    "checkBerry": "curl -s http://localhost:3002/users?userId=wmqbenfs23r | json_pp"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "@types/socket.io": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
+    "chalk": "4.0.0",
+    "express": "^4.19.2",
+    "multiplayer-tetris-types": "file:../types",
+    "nodemon": "^3.1.3",
+    "socket.io": "^4.8.1",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0"
+  }
+}

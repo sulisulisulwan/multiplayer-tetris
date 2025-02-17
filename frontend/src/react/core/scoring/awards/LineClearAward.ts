@@ -1,4 +1,4 @@
-import { genericObjectIF } from "../../../types"
+import { GenericObject } from "multiplayer-tetris-types/frontend";
 import { BaseAward } from "./BaseAward"
 
 export class LineClearAward extends BaseAward {
@@ -20,9 +20,10 @@ export class LineClearAward extends BaseAward {
   }
 
 
-  public calculateScore(currentScore: number, scoringData: genericObjectIF): number {
+  public calculateScore(currentScore: number, scoringData: GenericObject): number {
 
     const { currentLevel, linesCleared, performedTSpin, performedTSpinMini, backToBack } = scoringData
+
     let totalScore = currentScore
 
     if (linesCleared === 4) {

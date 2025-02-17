@@ -2,12 +2,27 @@ html {
   /* background-position: center; */
   height: 100%;
   animation: fadeIn 3s;
-  
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  /*
+    Introduced in IE 10.
+    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: none;
+  user-select: none;
 }
 
 body {
+  margin: 0;
   margin-left: 0px;
   margin-top: 0px;
+  height: 100%;
+  padding: 0px;
+}
+
+#app {
+  height: 100%;
 }
 
 @-webkit-keyframes fadeIn{
@@ -77,6 +92,16 @@ body {
     background-position: 50px 50px;
   }
 }
+
+
+@keyframes fadeOutAndMinimize {
+  0% {
+    font-size: 300px;
+  }
+  100% {
+    font-size: 20px;
+  }
+}
 /* Main styles */
 /*  */
 
@@ -101,17 +126,225 @@ body {
   color: white;
 }
 
-.text-next {
-  color: white;
-  font-family: Andale mono;
-  font-size: 30px;
-  margin-bottom: 20px;
-  align-content: center;
-}
 
 .start-quit-button-wrapper{
   display: flex;
   justify-content: center;
   margin-left: 40px;
+}
+
+
+.shine-bar-left-slow:before {
+  content: '';
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgba(255, 255, 255, 0.9) 400px, rgba(255, 255, 255, 0) 40px);
+  position: absolute;
+  background-repeat: repeat-x;
+  right: -900px;
+  width: 400px;
+  height: 100%;
+  opacity: .3;
+  animation: shine-left 40s infinite;
+  transform: skewX(-45deg);
+}
+
+.shine-bar-right-medium:before {
+  content: '';
+  background-image: linear-gradient(90deg, rgba(255, 255, 255, 0) 0px, rgba(255, 255, 255, 0.9) 400px, rgba(255, 255, 255, 0) 40px);
+  position: absolute;
+  background-repeat: repeat-x;
+  left: -1500px;
+  width: 400px;
+  height: 100%;
+  opacity: .3;
+  animation: shine-right-medium 20s infinite;
+  transform: skewX(-120deg);
+}
+
+.shine-bar-right:before {
+  content: '';
+  background-image: linear-gradient(90deg, #eee 0px, rgba(255, 255, 255, 0.4) 100px, #eee 200px);
+  position: absolute;
+  background-repeat: repeat-x;
+  left: -400px;
+  width: 200px;
+  height: 100%;
+  opacity: .1;
+  animation: shine-right 4s;
+  transform: skewX(-145deg);
+}
+
+
+@keyframes shine-left {
+  0% {
+    right: -900px;
+  }
+  100% {
+    right: 3000px;
+  }
+}
+
+@keyframes shine-right-medium {
+  0% {
+    left: -1500px;
+  }
+  100% {
+    left: 3000px;
+  }
+}
+@keyframes shine-right {
+  0% {
+    left: -900px;
+  }
+  100% {
+    left: 3000px;
+  }
+}
+
+
+/*these are for the playerslots in multiplayer*/
+
+.fade-in-section {
+  opacity: 0;
+  transform: translateY(10vh);
+  visibility: hidden;
+  transition: opacity 800ms ease-out, transform 200ms ease-out, visibility 800ms ease-out;
+  will-change: opacity, transform, visibility;
+}
+.fade-in-section.is-visible {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+}
+
+
+
+
+
+/* MODALS */
+
+@-webkit-keyframes fadeInModal{
+  from { opacity: 0; background-color: black; }
+  to { opacity: 1;}
+}
+
+@-moz-keyframes fadeInModal{
+  from { opacity: 0; background-color: black;}
+  to { opacity: 1; }
+}
+
+@-o-keyframes fadeInModal{
+  from { opacity: 0; background-color: rgba(0, 0, 0, .5); }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInModal{
+  from{opacity: 0;background-color: rgba(0, 0, 0, .5);}
+  to{opacity: 1;}
+}
+
+
+@-webkit-keyframes fadeOutModal{
+  from{opacity: 1; background-color: rgba(0, 0, 0, .5);}
+  to{opacity: 0;}
+}
+
+@-moz-keyframes fadeOutModal{
+  from{opacity: 1;background-color: rgba(0, 0, 0, .5);}
+  to{opacity: 0;}
+}
+
+@-o-keyframes fadeOutModal{
+  from{opacity: 1;background-color: rgba(0, 0, 0, .5);}
+  to{opacity: 0;}
+}
+
+@keyframes fadeOutModal{
+  from{opacity: 1;background-color: rgba(0, 0, 0, .5);}
+  to{opacity: 0;}
+}
+
+
+
+
+
+
+@-webkit-keyframes fadeInChatWindowOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-moz-keyframes fadeInChatWindowOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-o-keyframes fadeInChatWindowOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInChatWindowOverlay {
+  from {opacity: 0; }
+  to { opacity: 1; }
+}
+
+@-webkit-keyframes fadeOutChatWindowOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; } 
+}
+
+@-moz-keyframes fadeOutChatWindowOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; } 
+}
+
+@-o-keyframes fadeOutChatWindowOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; } 
+}
+
+@keyframes fadeOutChatWindowOverlay {
+  from { opacity: 1; }
+  to { opacity: 0; } 
+}
+
+@-webkit-keyframes fadeInChatWindowUnderlay {
+  from { opacity: 0; }
+  to { opacity: .5; }
+}
+
+@-moz-keyframes fadeInChatWindowUnderlay {
+  from { opacity: 0; }
+  to { opacity: .5; }
+}
+
+@-o-keyframes fadeInChatWindowUnderlay {
+  from { opacity: 0; }
+  to { opacity: .5; }
+}
+
+@keyframes fadeInChatWindowUnderlay {
+  from {opacity: 0; }
+  to { opacity: .5; }
+}
+
+@-webkit-keyframes fadeOutChatWindowUnderlay {
+  from { opacity: .5; }
+  to { opacity: 0; } 
+}
+
+@-moz-keyframes fadeOutChatWindowUnderlay {
+  from { opacity: .5; }
+  to { opacity: 0; } 
+}
+
+@-o-keyframes fadeOutChatWindowUnderlay {
+  from { opacity: .5; }
+  to { opacity: 0; } 
+}
+
+@keyframes fadeOutChatWindowUnderlay {
+  from { opacity: .5; }
+  to { opacity: 0; } 
 }
 

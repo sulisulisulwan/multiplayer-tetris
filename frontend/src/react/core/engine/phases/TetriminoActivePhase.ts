@@ -1,61 +1,65 @@
-import { appStateIF, sharedHandlersIF } from "../../../types"
-import BasePhase from "./BasePhase"
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend"
+import { BasePhase } from "multiplayer-tetris-types/frontend/core"
+import { AppState } from "multiplayer-tetris-types/frontend/shared"
+import { Dispatch } from "redux"
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState"
 
 export default abstract class TetriminoActivePhase extends BasePhase {
 
+  protected currGameState: AppState['gameState']
   
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
-  public abstract execute(): void
+  public abstract execute(gameState: AppState['gameState'], dispatch: Dispatch): void
 
-  handleAutorepeatActions(newState: appStateIF) {
-    const { override } = this.appState.playerAction.autoRepeat
+  handleAutorepeatActions(gameState: AppState['gameState'], dispatch: Dispatch, newGameState: LocalGameState) {
+    const { override } = gameState.playerAction.autoRepeat
+    
     if (!override) {
-      const autoRepeatDirection = this.appState.playerAction.autoRepeat.left ? 'left' : 'right'
-      if (this.appState.playerAction.autoRepeat[autoRepeatDirection] && this.appState[`${autoRepeatDirection}IntervalId`] === null) {
-        (newState.autoRepeatDelayTimeoutId as any) = this.setAutoRepeatDelayTimeout();
-        (newState[`${autoRepeatDirection}IntervalId`] as any) = this.setContinuousLeftOrRight(autoRepeatDirection)
+      const autoRepeatDirection = gameState.playerAction.autoRepeat.left ? 'left' : 'right'
+      if (gameState.playerAction.autoRepeat[autoRepeatDirection] && gameState[`${autoRepeatDirection}IntervalId`] === null) {
+        (newGameState.autoRepeatDelayTimeoutId as any) = this.setAutoRepeatDelayTimeout(dispatch);
+        (newGameState[`${autoRepeatDirection}IntervalId`] as any) = this.setContinuousLeftOrRight(gameState, dispatch, autoRepeatDirection)
       }
-    } else if (this.appState[`${override}IntervalId` as keyof appStateIF] === null) {
-      (newState.fallIntervalId as any) = this.setAutoRepeatDelayTimeout()
-      const intervalId = this.setContinuousLeftOrRight(override)
-      override === 'left' ? (newState.leftIntervalId as any) = intervalId : (newState.rightIntervalId as any) = intervalId //TODO: fix types
+    } else if (gameState[`${override}IntervalId` as keyof AppState['gameState']] === null) {
+      (newGameState[`${override}IntervalId` as keyof AppState['gameState']] as any) = this.setAutoRepeatDelayTimeout(dispatch)
+      const intervalId = this.setContinuousLeftOrRight(gameState, dispatch, override)
+      override === 'left' ? (newGameState.leftIntervalId as any) = intervalId : (newGameState.rightIntervalId as any) = intervalId //TODO: fix types
     }
 
-    return newState
+    return newGameState
   }
 
-  setAutoRepeatDelayTimeout(): NodeJS.Timer {
-    return setTimeout(this.unsetAutoRepeatDelayTimeoutId.bind(this), 300)
+  setAutoRepeatDelayTimeout(dispatch: Dispatch): NodeJS.Timer {
+    return setTimeout(this.unsetAutoRepeatDelayTimeoutId.bind(this), 300, dispatch)
   }
 
-  unsetAutoRepeatDelayTimeoutId(): void {
-    const newState = { autoRepeatDelayTimeoutId: null } as appStateIF
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+  protected unsetAutoRepeatDelayTimeoutId(dispatch: Dispatch): void {
+    const newGameState = { autoRepeatDelayTimeoutId: null } as AppState['gameState']
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
-  setContinuousLeftOrRight(direction: string): NodeJS.Timer {
-    return setInterval(this.continuousLeftOrRight.bind(this), 50, direction)
+  protected setContinuousLeftOrRight(gameState: AppState['gameState'], dispatch: Dispatch, direction: string): NodeJS.Timer {
+    return setInterval(this.continuousLeftOrRight.bind(this), 50, dispatch, direction)
   }
 
-  continuousLeftOrRight(playerAction: string): void {
+  protected continuousLeftOrRight(dispatch: Dispatch, playerAction: string): void {
 
-    if (this.appState.autoRepeatDelayTimeoutId) return 
+    if (this.currGameState.autoRepeatDelayTimeoutId) return 
     
     let { 
       newPlayfield, 
       newTetrimino, 
       successfulMove
-    } = this.tetriminoMovementHandler.moveOne(playerAction, this.appState.playfield, this.appState.currentTetrimino)
+    } = this.tetriminoMovementHandler.moveOne(playerAction, this.currGameState.playfield, this.currGameState.currentTetrimino)
     
     if (successfulMove)  {
-      return this.setAppState((prevState) => ({ 
-        ...prevState, // THIS STATE IS OUT OF DATE FOR SOME REASON. TODO: fix this hack
-        fallIntervalId: this.appState.fallIntervalId, // THIS IS A HACK
+      const newGameState = {
         currentTetrimino: newTetrimino,
         playfield: newPlayfield
-      }))
+      }
+      dispatch(updateMultipleGameStateFields({ ...newGameState }))
     }
 
   }

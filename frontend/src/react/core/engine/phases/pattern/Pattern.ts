@@ -1,14 +1,17 @@
-import { actionItemIF, appStateIF, genericObjectIF, patternScannersIF, patternItemIF, possibleActivePatternsIF, scoreItemIF, sharedHandlersIF } from "../../../../types";
-import BasePhase from "../BasePhase";
+import { GenericObject, LocalGameState, PatternItem, PatternScanners, PossibleActivePatternsMap, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
 import lineClear from './scanners/lineClear'
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../../redux/reducers/gameState";
 
 export default class Pattern extends BasePhase {
 
   private patternsToMatch: string[]
-  private patternScanners: patternScannersIF
+  private patternScanners: PatternScanners
   constructor(
-    sharedHandlers: sharedHandlersIF, 
-    possibleActivePatterns: possibleActivePatternsIF
+    sharedHandlers: SharedHandlersMap, 
+    possibleActivePatterns: PossibleActivePatternsMap
   ) {
     super(sharedHandlers)
     this.patternsToMatch = this.loadPatternsToMatch(possibleActivePatterns)
@@ -17,36 +20,35 @@ export default class Pattern extends BasePhase {
     }
   }
 
-  execute() {
-    // console.log('>>>> PATTERN PHASE')
-    const foundPatterns = this.runPatternScanners() 
-    const newState = this.deriveNewStatePropsFromPatterns(foundPatterns) as appStateIF
-    newState.patternItems = foundPatterns
-    newState.currentGamePhase = newState.patternItems.length ? 'updateScore' : 'completion' // If there are no patterns to process through elimination, animation, and iteration, skip to completion.
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+  execute(gameState: AppState['gameState'], dispatch: Dispatch) {
+    const foundPatterns = this.runPatternScanners(gameState) 
+    const newGameState = this.deriveNewStatePropsFromPatterns(foundPatterns) as LocalGameState
+    newGameState.patternItems = foundPatterns
+    newGameState.currentGamePhase = newGameState.patternItems.length ? 'updateScore' : 'completion' // If there are no patterns to process through elimination, animation, and iteration, skip to completion.
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
-  private deriveNewStatePropsFromPatterns(foundPatterns: patternItemIF[]) {
-    const newState: genericObjectIF = {}
+  private deriveNewStatePropsFromPatterns(foundPatterns: PatternItem[]) {
+    const newGameState: GenericObject = {}
     foundPatterns.forEach(patternItem => {
       const { stateUpdate } = patternItem
       if (stateUpdate) {
         stateUpdate.forEach(update => {
           const { field, value } = update
-          newState[field as keyof genericObjectIF] = value
+          newGameState[field as keyof GenericObject] = value
         })
       }
     })
-    return newState
+    return newGameState
   }
 
-  private runPatternScanners() {
+  private runPatternScanners(gameState: AppState['gameState']) {
     const patternsToMatch = this.patternsToMatch
-    const foundPatterns: patternItemIF[] = []
+    const foundPatterns: PatternItem[] = []
 
     patternsToMatch.forEach(pattern => {
-      const scanner = this.patternScanners[pattern as keyof patternScannersIF]
-      const foundPattern = scanner()
+      const scanner = this.patternScanners[pattern as keyof PatternScanners]
+      const foundPattern = scanner(gameState)
       if (foundPattern) { 
         foundPatterns.push(foundPattern)
       }
@@ -55,11 +57,11 @@ export default class Pattern extends BasePhase {
     return foundPatterns
   }
 
-  private loadPatternsToMatch(possibleActivePatterns: possibleActivePatternsIF): string[] {
+  private loadPatternsToMatch(possibleActivePatterns: PossibleActivePatternsMap): string[] {
     const patternsToLoad = []
 
     for (const pattern in possibleActivePatterns) {
-      const currPatternActive = possibleActivePatterns[pattern as keyof possibleActivePatternsIF]
+      const currPatternActive = possibleActivePatterns[pattern as keyof PossibleActivePatternsMap]
       if (currPatternActive) {
         patternsToLoad.push(pattern)
       }

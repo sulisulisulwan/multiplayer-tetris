@@ -1,20 +1,22 @@
-import { appStateIF, sharedHandlersIF } from "../../../types";
-import BasePhase from "./BasePhase";
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState";
 
 export default class Iterate extends BasePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
   
-  execute() {
+  execute(_: AppState['gameState'], dispatch: Dispatch) {
     // console.log('>>>> ITERATE PHASE')
-    const newState = {} as appStateIF
+    const newGameState = {} as LocalGameState
 
     const todoCondition: undefined = undefined
-    newState.currentGamePhase = todoCondition ? 'pattern' : 'completion'/**TODO: This will be replaced with a condition where the game mode requires pattern scans after eliminations */ 
-
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    newGameState.currentGamePhase = todoCondition ? 'pattern' : 'completion'/**TODO: This will be replaced with a condition where the game mode requires pattern scans after eliminations */ 
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
 }

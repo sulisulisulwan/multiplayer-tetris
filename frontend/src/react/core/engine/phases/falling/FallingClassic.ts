@@ -1,20 +1,25 @@
-import { appStateIF, sharedHandlersIF } from "../../../../types";
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
 import ScoreItemFactory from "../../../scoring/ScoreItemFactory";
+import trail from "../../../tetrimino/trail/Trail";
 import FallingPhase from "./Falling";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../../redux/reducers/gameState";
 
 export default class FallingClassic extends FallingPhase {
 
   private scoreItemFactory: ScoreItemFactory
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
     this.scoreItemFactory = new ScoreItemFactory()
   }
 
-  continuousFallEvent(): void {
-    
-    const newState = {} as appStateIF
-    const { playfield, currentTetrimino, fallIntervalId } = this.appState
+  continuousFallEvent(dispatch: Dispatch): void {
+    const gameState = this.currGameState
+
+    const newGameState = {} as LocalGameState
+    const { playfield, currentTetrimino, fallIntervalId } = gameState
 
     // Get info on where the tetrimino will be if moved one square down from curren tposition
     let { 
@@ -28,16 +33,20 @@ export default class FallingClassic extends FallingPhase {
     if (successfulMove)  {
 
       // Handle softdrop scoring
-      if (this.appState.playerAction.softdrop) {
-        const scoreItem = this.scoreItemFactory.getItem('softdrop', this.appState, null)
-        newState.totalScore = this.scoringHandler.updateScore(this.appState.totalScore, scoreItem)
+      if (gameState.playerAction.softdrop) {
+        const scoreItem = this.scoreItemFactory.getItem('softdrop', gameState, null)
+        newGameState.totalScore = this.scoringHandler.updateScore(gameState.totalScore, scoreItem)
       }
 
-      newState.currentTetrimino = newTetrimino
-      newState.playfield = newPlayfield
-      newState.performedTSpin = false 
-      newState.performedTSpinMini = false
-      newState.postLockMode = false
+      newGameState.currentTetrimino = newTetrimino
+      newGameState.playfield = newPlayfield
+      newGameState.performedTSpin = false 
+      newGameState.performedTSpinMini = false
+      newGameState.postLockMode = false
+
+      if (gameState.playerAction.softdrop) {
+        newGameState.playfieldOverlay = trail.addToSoftdropTrail(newTetrimino, gameState.playfieldOverlay)
+      }
 
       // If new Tetrimino location has reached a surface, trigger lock phase
       const { successfulMove } = this.tetriminoMovementHandler.moveOne('down', newPlayfield, newTetrimino)
@@ -45,17 +54,17 @@ export default class FallingClassic extends FallingPhase {
 
       if (tetriminoWillHaveReachedSurface) {
 
-        if (this.appState.playerAction.softdrop) {
-          newState.playfield = newPlayfield
+        if (gameState.playerAction.softdrop) {
+          newGameState.playfield = newPlayfield
         }
         clearInterval(fallIntervalId)
-        newState.fallIntervalId = null
-        newState.currentGamePhase = 'lock'
+        newGameState.fallIntervalId = null
+        newGameState.currentGamePhase = 'lock'
       }
 
     }
 
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
 

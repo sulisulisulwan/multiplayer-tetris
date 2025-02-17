@@ -1,15 +1,9 @@
-import { 
-  coordinates, 
-  flipDirections, 
-  orientationsIF, 
-  relativeOrientations, 
-  tetriminoIF 
-} from "../../../../types"
+import { Coordinates, FlipDirectionsMap, OrientationsMap, RelativeOrientationsMap, Tetrimino } from "multiplayer-tetris-types/frontend"
 import { makeCopy } from "../../../utils/utils"
 import { TetriminoMovementHandler } from "../TetriminoMovementHandler"
 export class ClassicRotationSystem extends TetriminoMovementHandler{
 
-  readonly relativeOrientations: relativeOrientations
+  readonly relativeOrientations: RelativeOrientationsMap
 
   constructor() {
     super()
@@ -21,23 +15,23 @@ export class ClassicRotationSystem extends TetriminoMovementHandler{
     }
   }
 
-  flipClockwise(playfield: string[][], tetrimino: tetriminoIF) {
+  flipClockwise(playfield: string[][], tetrimino: Tetrimino) {
     return this.flip(tetrimino, 'flipClockwise', playfield)
   }
   
-  flipCounterClockwise(playfield: string[][], tetrimino: tetriminoIF) {
+  flipCounterClockwise(playfield: string[][], tetrimino: Tetrimino) {
     return this.flip(tetrimino, 'flipCounterClockwise', playfield)
   }
 
-  flip(tetrimino: tetriminoIF, playerInput: string, playfield: string[][]) {
+  flip(tetrimino: Tetrimino, playerInput: string, playfield: string[][]) {
     const { currentOrientation, currentOriginOnPlayfield } = tetrimino
     const targetOrientation = this.getTargetOrientation(currentOrientation, playerInput)
-    const oldCoordsOffOriginAndRotationPoints = tetrimino.orientations[currentOrientation as keyof orientationsIF]
-    const targetCoordsOffOriginAndRotationPoints = tetrimino.orientations[targetOrientation as keyof orientationsIF]
+    const oldCoordsOffOriginAndRotationPoints = tetrimino.orientations[currentOrientation as keyof OrientationsMap]
+    const targetCoordsOffOriginAndRotationPoints = tetrimino.orientations[targetOrientation as keyof OrientationsMap]
     const targetCoordsOffOrigin = targetCoordsOffOriginAndRotationPoints.coordsOffOrigin
 
-    const oldCoordsOnPlayfield = oldCoordsOffOriginAndRotationPoints.coordsOffOrigin.map((oldCoordsOffOrigin: coordinates) => {
-      return [tetrimino.currentOriginOnPlayfield[0] + oldCoordsOffOrigin[0], tetrimino.currentOriginOnPlayfield[1] + oldCoordsOffOrigin[1]] as coordinates
+    const oldCoordsOnPlayfield = oldCoordsOffOriginAndRotationPoints.coordsOffOrigin.map((oldCoordsOffOrigin: Coordinates) => {
+      return [tetrimino.currentOriginOnPlayfield[0] + oldCoordsOffOrigin[0], tetrimino.currentOriginOnPlayfield[1] + oldCoordsOffOrigin[1]] as Coordinates
     })
     
     let playfieldCopy = makeCopy(playfield)
@@ -68,19 +62,19 @@ export class ClassicRotationSystem extends TetriminoMovementHandler{
   }
 
   getTargetOrientation(currentOrientation: string, flipDirection: string) {
-    const relativeOrientation = this.relativeOrientations[currentOrientation as keyof relativeOrientations]
-    const targetOrientation = relativeOrientation[flipDirection as keyof flipDirections]
+    const relativeOrientation = this.relativeOrientations[currentOrientation as keyof RelativeOrientationsMap]
+    const targetOrientation = relativeOrientation[flipDirection as keyof FlipDirectionsMap]
     return targetOrientation
   }
 
-  getFlippedPlayfieldCoords(targetCoordsOffOrigin: coordinates[], currentOriginOnPlayfield: coordinates, offset: coordinates): coordinates[] {
+  getFlippedPlayfieldCoords(targetCoordsOffOrigin: Coordinates[], currentOriginOnPlayfield: Coordinates, offset: Coordinates): Coordinates[] {
     
     const [verticalOrigin, horizontalOrigin] = currentOriginOnPlayfield
     const [verticalOffset, horizontalOffset] = offset
-    return targetCoordsOffOrigin.map((pointCoords: coordinates) => [pointCoords[0] + verticalOrigin + verticalOffset, pointCoords[1] + horizontalOrigin + horizontalOffset])
+    return targetCoordsOffOrigin.map((pointCoords: Coordinates) => [pointCoords[0] + verticalOrigin + verticalOffset, pointCoords[1] + horizontalOrigin + horizontalOffset])
   }
 
-  calculateOffsetTowardsStartPoint(startPoint: coordinates, endPoint: coordinates): coordinates {
+  calculateOffsetTowardsStartPoint(startPoint: Coordinates, endPoint: Coordinates): Coordinates {
     const [ startX, startY ] = startPoint
     const [ endX, endY ] = endPoint
     return [ startX - endX, startY - endY]

@@ -18,4 +18,14 @@ export const allSoundEffects = [
   { name: 'hold', src: null },
   { name: 'movementFailure', src: null },
   { name: 'rotationFailure', src: null },
+
+  // Menu Sounds
+  { name: 'menuBasicButtonClick', src: './assets/sound/menu-basic-button-click.wav' },
+  { name: 'menuBasicButtonHover', src: './assets/sound/menu-basic-button-hover.wav' },
+  { name: 'menuBackButtonClick', src: './assets/sound/menu-back-button.ogg' },
+  { name: 'menuPlayerSlotRemove', src: './assets/sound/menu-playerslot-remove.mp3' },
+  { name: 'menuPlayerSlotPlace', src: './assets/sound/menu-playerslot-place.wav' },
+  { name: 'menuEnqueue', src: './assets/sound/menu-enqueue.wav' },
+  { name: 'menuDequeue', src: './assets/sound/menu-dequeue.wav' },
+  { name: 'matchFound', src: './assets/sound/menu-matchfound.wav' },
 ]

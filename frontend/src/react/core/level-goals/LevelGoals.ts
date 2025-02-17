@@ -1,7 +1,8 @@
+import { LevelGoals as LevelGoalsAbstract } from 'multiplayer-tetris-types/frontend/core'
 import { FixedGoalSpecs } from "./modes/FixedGoalSpecs"
 import { VariableGoalSpecs } from "./modes/VariableGoalSpecs"
 
-export class LevelGoals {
+export class LevelGoals implements LevelGoalsAbstract {
 
   private fallSpeeds: Map<number, number>
   private goalModesMap: Map<string, any>
@@ -13,7 +14,14 @@ export class LevelGoals {
     this.goalSpecsHandler = this.loadGoalSpecs(mode)    
   }
 
-  loadFallSpeedsMap(): Map<number, number> {
+  public getNewLevelSpecs(newLevel: number, totalLinesCleared: number) { 
+    return {
+      levelClearedLinesGoal: this.goalSpecsHandler.getClearedLinesGoals(newLevel, totalLinesCleared),
+      fallSpeed: this.fallSpeeds.get(newLevel)
+    }
+  }
+
+  private loadFallSpeedsMap(): Map<number, number> {
     // level, seconds till dropping to next line
     return new Map([
       [1, 1000],
@@ -34,23 +42,18 @@ export class LevelGoals {
     ])
   }
 
-  loadGoalModesMap(): Map<string, any> {
+  private loadGoalModesMap(): Map<string, any> {
     return new Map([
       ['fixed', FixedGoalSpecs],
       ['variable', VariableGoalSpecs]
     ])
   }
   
-  loadGoalSpecs(mode: string): any {
+  private loadGoalSpecs(mode: string): any {
     const ctor = this.goalModesMap.get(mode)
     return new ctor()
   }
 
-  getNewLevelSpecs(newLevel: number, totalLinesCleared: number) { 
-    return {
-      levelClearedLinesGoal: this.goalSpecsHandler.getClearedLinesGoals(newLevel, totalLinesCleared),
-      fallSpeed: this.fallSpeeds.get(newLevel)
-    }
-  }
+
 
 }

@@ -1,21 +1,32 @@
 
 .playfield-square {
-  background-color: black;
-  height: 20px;
-  width: 20px;
-  opacity: .8;
+  height: 30px;
+  width: 30px;
+  opacity: .7;
+  z-index: 200;
+}
+
+.playfield-overlay-square {
+  background-color: none;
+  height: 30px;
+  width: 30px;
+  /* opacity: .1; */
+  z-index: 201
 }
 
 .tetrimonio-square {
   border-style: solid;
-  border-color: black;
+  border-color: midnightblue;
   border-radius: 20%;
-  height: 16px;
-  width: 16px;
+  border-width: 3px;
+  height: 25px;
+  width: 25px;
+  z-index: 203;
 }
 
 .tetrimino-shimmer {
-  box-shadow: 2px 2px 10px 3px white;
+  /* box-shadow: 2px 2px 10px 3px white; */
+  box-shadow: 2px 2px 10px 2px white;
 }
 
 .iTet { background-color: rgb(141, 141, 141); }
@@ -27,36 +38,47 @@
 .zTet { background-color: white; }
 
 .trail-0 {
-  background-color: rgb(40,40,40);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(40,40,40); */
+  background-color: white;
+  opacity: .05;
+  height: 25px;
+  width: 25px;
 }
 
 .trail-1 {
-  background-color: rgb(80,80,80);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(80,80,80); */
+  background-color: white;
+  opacity: .1;
+  height: 25px;
+  width: 25px;
 }
 .trail-2 {
-  background-color: rgb(120,120,120);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(120,120,120); */
+  background-color: white;
+  opacity: .2;
+  height: 25px;
+  width: 25px;
 }
 .trail-3 {
-  background-color: rgb(180,180,180);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(180,180,180); */
+  background-color: white;
+  opacity: .3;
+  height: 25px;
+  width: 25px;
 }
 .trail-4 {
-  background-color: rgb(220,220,220);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(220,220,220); */
+  background-color: white;
+  opacity: .4;
+  height: 25px;
+  width: 25px;
 }
 .trail-5 {
-  /* box-shadow: 2px 2px 10px 3px white; */
-  background-color: rgb(255,255,255);
-  height: 16px;
-  width: 16px;
+  /* background-color: rgb(255,255,255); */
+  background-color: white;
+  opacity: .7;
+  height: 25px;
+  width: 25px;
 }
 
 .ghostTet {

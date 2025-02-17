@@ -1,31 +1,34 @@
-import { appStateIF, sharedHandlersIF } from "../../../types/index";
-import BasePhase from "./BasePhase";
+import { LocalGameState, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from "multiplayer-tetris-types/frontend/core";
+import { AppState } from "multiplayer-tetris-types/frontend/shared";
+import { Dispatch } from "redux";
+import { updateMultipleGameStateFields } from "../../../redux/reducers/gameState";
 
 export default class Completion extends BasePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
   
-  public execute() {
+  public execute(_: AppState['gameState'], dispatch: Dispatch) {
     // console.log('>>>> COMPLETION PHASE')
-    let newState = {} as appStateIF
+    let newGameState = {} as LocalGameState
 
-    newState.currentTetrimino = null
-    newState.performedTSpin = false
-    newState.performedTSpinMini = false
-    newState.currentGamePhase = 'generation';
+    newGameState.currentTetrimino = null
+    newGameState.performedTSpin = false
+    newGameState.performedTSpinMini = false
+    newGameState.currentGamePhase = 'generation';
 
-    
-    
-    this.setAppState((prevState) => {
-      const updatedState = { ...prevState, ...newState}
-      this.sendUpdateToServer(updatedState)
-      return updatedState
-    })
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
-  protected sendUpdateToServer(newState: appStateIF) {
+
+  // TODO: how will this actually be implemented?  
+  // In EVERY state update within the engine, (phase, player moves, anything which changes the state) we need to check if this
+  // is a multiplayer game or singleplayer game.  if singleplayer, we can make updates to local state
+  // otherwise, we need to send updates to the server and then receive the
+  // update from the server via DGRAM 
+  protected sendUpdateToServer(newState: AppState) {
     const dataPayload = { action: 'updateServerGameState', data: newState };
     (window as any).electronBridge.sendToElectron('dgram', dataPayload)
   }

@@ -1,21 +1,21 @@
 import { makeCopy } from "../../../utils/utils"
-import { coordinates, orientationsIF, rotationPointsIF, tetriminoIF } from "../../../../types"
 import { ClassicRotationSystem } from "./ClassicRS"
-import { TSpinCalculator } from "./TSpinCalculator"
+import { TSpinCalculator } from "../TSpinCalculator"
+import { Coordinates, OrientationsMap, RotationPointsMap, Tetrimino } from "multiplayer-tetris-types/frontend"
 export class SuperRotationSystem extends ClassicRotationSystem {
 
   constructor() {
     super()
   }
 
-  flip(tetrimino: tetriminoIF, playerInput: string, playfield: string[][]) {
+  flip(tetrimino: Tetrimino, playerInput: string, playfield: string[][]) {
     const { currentOrientation, currentOriginOnPlayfield } = tetrimino
     const targetOrientation = this.getTargetOrientation(currentOrientation, playerInput)
 
-    const targetCoordsOffOrigin = tetrimino.orientations[targetOrientation as keyof orientationsIF].coordsOffOrigin
+    const targetCoordsOffOrigin = tetrimino.orientations[targetOrientation as keyof OrientationsMap].coordsOffOrigin
 
-    const oldRotationPoints = tetrimino.orientations[currentOrientation as keyof orientationsIF].rotationPoints
-    const targetRotationPoints = tetrimino.orientations[targetOrientation as keyof orientationsIF].rotationPoints
+    const oldRotationPoints = tetrimino.orientations[currentOrientation as keyof OrientationsMap].rotationPoints
+    const targetRotationPoints = tetrimino.orientations[targetOrientation as keyof OrientationsMap].rotationPoints
 
     const oldCoordsOnPlayfield = this.getPlayfieldCoords(tetrimino)
 
@@ -24,8 +24,8 @@ export class SuperRotationSystem extends ClassicRotationSystem {
     let flipPoint = 1
     
     while (flipPoint <= 5) {
-      const startPoint: coordinates = oldRotationPoints[flipPoint.toString() as keyof rotationPointsIF]
-      const endPoint: coordinates = targetRotationPoints[flipPoint.toString() as keyof rotationPointsIF]
+      const startPoint: Coordinates = oldRotationPoints[flipPoint.toString() as keyof RotationPointsMap]
+      const endPoint: Coordinates = targetRotationPoints[flipPoint.toString() as keyof RotationPointsMap]
       const offset = this.calculateOffsetTowardsStartPoint(startPoint, endPoint)
       const targetCoordsOnPlayfield = this.getFlippedPlayfieldCoords(targetCoordsOffOrigin, currentOriginOnPlayfield, offset)
        

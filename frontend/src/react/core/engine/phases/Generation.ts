@@ -1,45 +1,45 @@
-import BasePhase from "./BasePhase";
 import { NextQueue } from '../../next-queue/NextQueue'
-import { sharedHandlersIF, coordinates } from "../../../types";
+import { Coordinates, SharedHandlersMap } from "multiplayer-tetris-types/frontend";
+import { BasePhase } from 'multiplayer-tetris-types/frontend/core';
+import { AppState } from 'multiplayer-tetris-types/frontend/shared';
+import { Dispatch } from 'redux';
+import { updateMultipleGameStateFields } from '../../../redux/reducers/gameState';
+import { makeCopy } from '../../utils/utils';
 
 export default class Generation extends BasePhase {
 
-  constructor(sharedHandlers: sharedHandlersIF) {
+  constructor(sharedHandlers: SharedHandlersMap) {
     super(sharedHandlers)
   }
 
-  execute() {
-    // console.log('>>> GENERATION PHASE')
+  execute(gameState: AppState['gameState'], dispatch: Dispatch) {
+    console.log('GENERATION PHASE')
 
-    const newTetrimino = this.determineIfNewTetriminoSwappedIn()
+    const newTetrimino = this.determineIfNewTetriminoSwappedIn(gameState)
     const newTetriminoBaseRowIdx = this.tetriminoMovementHandler.getLowestPlayfieldRowOfTetrimino(newTetrimino)
-
-    const nextQueueData = this.nextQueueHandler.queueToArray(this.appState.gameOptions.nextQueueSize)
-    
+    const nextQueueData = this.nextQueueHandler.queueToArray(gameState.gameOptions.nextQueueSize)
     const targetStartingCoords = this.tetriminoMovementHandler.getPlayfieldCoords(newTetrimino)
-
-    const playfield = this.appState.playfield
-    const newState = this.appState
-
+    const playfield = makeCopy(gameState.playfield)
+    const newGameState: any = {}
+    
     if (this.gameIsOver(targetStartingCoords, playfield)) {
-      newState.currentGamePhase = 'gameOver'
-      this.setAppState((prevState) => ({ ...prevState, ...newState}))
-      return
+      newGameState.currentGamePhase = 'gameOver'
+      return dispatch(updateMultipleGameStateFields({ ...newGameState }))
     }
     
     // Place dequeued tetrimino in playfield
     let newPlayfield = this.tetriminoMovementHandler.addTetriminoToPlayfield(targetStartingCoords, playfield, newTetrimino.minoGraphic)
 
-    if (this.appState.gameOptions.ghostTetriminoOn) {
+    if (gameState.gameOptions.ghostTetriminoOn) {
       const ghostCoords = this.tetriminoMovementHandler.getGhostCoords(newTetrimino, newPlayfield)
-      newState.playfield = this.tetriminoMovementHandler.addTetriminoToPlayfield(ghostCoords, playfield, '[g]')
-      newState.ghostCoords = ghostCoords
+      newGameState.playfield = this.tetriminoMovementHandler.addTetriminoToPlayfield(ghostCoords, playfield, '[g]')
+      newGameState.ghostCoords = ghostCoords
     } else {
-      newState.playfield = newPlayfield
+      newGameState.playfield = newPlayfield
     }
 
     // Update swap status in case hold queue has been used
-    let { swapStatus } = this.appState.holdQueue
+    let swapStatus = gameState.holdQueue.swapStatus
     if (swapStatus === 'justSwapped') {
       swapStatus = 'swapAvailableNextTetrimino'
     } else if (swapStatus === 'swapAvailableNextTetrimino') {
@@ -47,33 +47,32 @@ export default class Generation extends BasePhase {
     }
 
     // Update state
-    newState.nextQueue = nextQueueData
-    
-    newState.currentTetrimino = newTetrimino,
-    newState.currentGamePhase = 'falling',
-    newState.lowestLockSurfaceRow = newTetriminoBaseRowIdx
-    newState.holdQueue.swapStatus = swapStatus
-    newState.extendedLockdownMovesRemaining = 15
-    
-    this.setAppState((prevState) => ({ ...prevState, ...newState}))
+    newGameState.nextQueue = nextQueueData
+    newGameState.currentTetrimino = newTetrimino,
+    newGameState.currentGamePhase = 'falling',
+    newGameState.lowestLockSurfaceRow = newTetriminoBaseRowIdx
+    newGameState.holdQueue = { ...gameState.holdQueue }
+    newGameState.holdQueue.swapStatus = swapStatus
+    newGameState.extendedLockdownMovesRemaining = 15
+    dispatch(updateMultipleGameStateFields({ ...newGameState }))
   }
 
-  gameIsOver(startingOrientationCoords: coordinates[], playfield: string[][]) {
+  gameIsOver(startingOrientationCoords: Coordinates[], playfield: string[][]) {
     // Block out - newly-generated tetrimino blocked due to existing block in matrix
     const gridCoordsAreClear = this.tetriminoMovementHandler.gridCoordsAreClear(startingOrientationCoords, playfield)
     const gameIsOver = gridCoordsAreClear ? false : true
     return gameIsOver
   }
 
-  determineIfNewTetriminoSwappedIn() {
+  determineIfNewTetriminoSwappedIn(gameState: AppState['gameState']) {
     let newTetrimino 
 
     // if the game just started OR player held for the first time
-    if (this.appState.currentTetrimino === null) {
+    if (gameState.currentTetrimino === null) {
       // Dequeue a new tetrimino and instantiate it.
       newTetrimino = this.nextQueueHandler.dequeue()
-    } else if (this.appState.holdQueue.swapStatus === 'justSwapped') {
-      newTetrimino = this.appState.currentTetrimino
+    } else if (gameState.holdQueue.swapStatus === 'justSwapped') {
+      newTetrimino = gameState.currentTetrimino
     }
     return newTetrimino
   }

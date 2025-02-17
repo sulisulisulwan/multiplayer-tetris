@@ -1,21 +1,22 @@
-import { genericObjectIF, scoreItemIF, scoringHistoryPerCycleIF } from "../../../types"
+import { GenericObject, ScoreItem, ScoringHistoryPerCycle, ScoringMethods } from "multiplayer-tetris-types/frontend"
 import { 
   LineClearAward,
   SoftdropAward,
   HarddropAward,
   TSpinMiniNoLineClearAward,
   TSpinNoLineClearAward
-} from "../awards"
-import { BaseScoringHandler } from "./BaseScoringHandler"
+} from '../awards'
+import { BaseScoringHandler as BaseScoringHandlerAbstract} from "multiplayer-tetris-types/frontend/core"
 
 
-export class ClassicScoringHandler extends BaseScoringHandler {
+export class ClassicScoringHandler extends BaseScoringHandlerAbstract {
 
   private awardLineClear: LineClearAward
   private awardSoftdrop: SoftdropAward
   private awardHarddrop: HarddropAward
   private awardTSpinNoLineClear: TSpinNoLineClearAward
   private awardTSpinMiniNoLineClear: TSpinMiniNoLineClearAward
+  protected scoringMethods: ScoringMethods
 
   constructor() {
     super()
@@ -34,15 +35,21 @@ export class ClassicScoringHandler extends BaseScoringHandler {
       tSpinMiniNoLineClear: this.tSpinMiniNoLineClear.bind(this)
     }
     
+  } 
+
+  public updateScore(currentScore: number, scoreItem: ScoreItem) {
+    const { type, data } = scoreItem
+    const scoringMethod = this.scoringMethods[type as keyof ScoringMethods]
+    return scoringMethod(currentScore, data)
   }
 
   public handleCompletionPhaseAccrual(
     currentScore: number, 
-    scoreItemsForCompletion: scoreItemIF[], 
-    scoringHistoryPerCycle: scoringHistoryPerCycleIF
+    scoreItemsForCompletion: ScoreItem[], 
+    scoringHistoryPerCycle: ScoringHistoryPerCycle
   ): number {
 
-    const filteredScoringContexts = scoreItemsForCompletion.filter((scoreItem: scoreItemIF) => {
+    const filteredScoringContexts = scoreItemsForCompletion.filter((scoreItem: ScoreItem) => {
       const { type } = scoreItem
 
       if (type === 'tSpinNoLineClear' || type === 'tSpinMiniNoLineClear') {
@@ -53,7 +60,7 @@ export class ClassicScoringHandler extends BaseScoringHandler {
 
     })
 
-    const newTotalScore = filteredScoringContexts.reduce((runningScore: number, scoreItem: scoreItemIF) => {
+    const newTotalScore = filteredScoringContexts.reduce((runningScore: number, scoreItem: ScoreItem) => {
       return this.updateScore(runningScore, scoreItem)
     }, currentScore)
 
@@ -62,28 +69,28 @@ export class ClassicScoringHandler extends BaseScoringHandler {
   }
 
   // Executed within PlayerAction or Falling Phase
-  softdrop(currentScore: number, scoringData: genericObjectIF) {
+  protected softdrop(currentScore: number, scoringData: GenericObject) {
     const newTotalScore = this.awardSoftdrop.calculateScore(currentScore, scoringData)
     return newTotalScore
   }
 
-  harddrop(currentScore: number, scoringData: genericObjectIF) {
+  protected harddrop(currentScore: number, scoringData: GenericObject) {
     const newTotalScore = this.awardHarddrop.calculateScore(currentScore, scoringData)
     return newTotalScore
   }
 
   // Executed in Completion Phase
-  lineClear(currentScore: number, scoringData: genericObjectIF) {
+  protected lineClear(currentScore: number, scoringData: GenericObject) {
     const newTotalScore = this.awardLineClear.calculateScore(currentScore, scoringData)
     return newTotalScore
   }
 
-  tSpinNoLineClear(currentScore: number, scoringData: genericObjectIF) {
+  protected tSpinNoLineClear(currentScore: number, scoringData: GenericObject) {
     const newTotalScore = this.awardTSpinNoLineClear.calculateScore(currentScore, scoringData)
     return newTotalScore
   }
   
-  tSpinMiniNoLineClear(currentScore: number, scoringData: genericObjectIF) {
+  protected tSpinMiniNoLineClear(currentScore: number, scoringData: GenericObject) {
     const newTotalScore = this.awardTSpinMiniNoLineClear.calculateScore(currentScore, scoringData)
     return newTotalScore  
   }
