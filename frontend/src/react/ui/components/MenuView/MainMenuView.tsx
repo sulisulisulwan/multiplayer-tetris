@@ -1,7 +1,7 @@
 import * as React from 'react'
 import HoverButton from '../sharedComponents/HoverButton'
 import { useDispatch } from 'react-redux'
-import { setViewToMultiplayer, setViewToSingleplayer } from '../../../redux/reducers/view'
+import { setViewToMultiplayer, setViewToSingleplayer } from 'multiplayer-tetris-redux'
 import { soundEffects } from '../../../App'
 
 const MainMenuView = () => {

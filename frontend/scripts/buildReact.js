@@ -25,7 +25,6 @@ const entryPoints = users.reduce((allEntryPoints, currUser) => {
   return allEntryPoints
 },{})
 
-const tsconfigPath =  path.resolve(__dirname, `../react-tsconfig.json`)
 
 const reactConfig = {
   target: "node",

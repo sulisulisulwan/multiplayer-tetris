@@ -108,7 +108,7 @@ const multiplayerGameState: MultiplayerLocalGameState = {
   gameOptions: getDefaultGameOptions('multiplayer'),
 }
 
-const getDefaultGameStates = (type: string) => {
+const getDefaultGameStates = (type: 'singleplayer' | 'multiplayer') => {
   if (type === 'singleplayer') return singleplayerGameState
   if (type === 'multiplayer') return multiplayerGameState
 }

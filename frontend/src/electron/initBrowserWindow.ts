@@ -10,8 +10,8 @@ const initBrowserWindow = (htmlDistPath: string) => {
     // resizable: false,
     // frame: false,
     autoHideMenuBar: true,
-    width: width, 
-    height: height,
+    width: width /2, 
+    height: height /2,
     webPreferences:  {
       nodeIntegration: true,
       preload: path.resolve(__dirname, "./preload/preload.cjs")

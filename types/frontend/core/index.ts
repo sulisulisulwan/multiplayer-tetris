@@ -1,5 +1,4 @@
-import { AppState, SetAppState } from "../shared"
-import { makeCopy } from "../../../frontend/src/react/core/utils/utils"
+import { AppState } from "../shared"
 import * as Redux from 'redux'
 
 export abstract class Action {
@@ -203,8 +202,8 @@ export interface SingleplayerLocalGameState {
   performedTSpin: boolean
   performedTSpinMini: boolean
   playerAction: PlayerAction,
-  playfield: string[][]
-  playfieldOverlay: string[][]
+  playfield: string[][] | null
+  playfieldOverlay: string[][] | null
   postLockMode: boolean
   pregameCounter: number
   pregameIntervalId: null | ReturnType<typeof setTimeout>
@@ -236,8 +235,8 @@ export declare interface MultiplayerLocalGameState {
   performedTSpin: boolean
   performedTSpinMini: boolean
   playerAction: PlayerAction,
-  playfield: string[][]
-  playfieldOverlay: string[][]
+  playfield: string[][] | null
+  playfieldOverlay: string[][] | null
   postLockMode: boolean
   pregameCounter: number
   pregameIntervalId: null | ReturnType<typeof setTimeout>
@@ -346,10 +345,23 @@ export interface SingleplayerOptions {
   
 }
 export interface MultiplayerOptions {
+  possibleActivePatterns: {
+    lineClear: boolean
+  },
+  levelGoalsSystem: 'variable' | 'fixed'
+  lockMode: 'classic' | 'extended' | 'infinite'
   ghostTetriminoOn: boolean
-  nextQueueSize: number
+  holdQueueAvailable: boolean
+  rotationSystem: 'classic' | 'super'
+  scoringSystem: 'classic',
   startingLevel: number
+  startingLines: number
+  nextQueueSize: number
   backgroundMusic: string
+  volume: {
+    soundeffects: number,
+    music: number
+  }
 }
 export type GameOptions = SingleplayerOptions | MultiplayerOptions
 export interface GenericObject {

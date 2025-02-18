@@ -2,15 +2,13 @@ import * as React from 'react'
 
 import PlayfieldGrid from './playfield/PlayfieldGrid'
 import NextQueueDisplay from './next-queue/NextQueueDisplay'
-import StartQuitButton from './StartQuitButton'
 import ScoreDisplay from './score-display/ScoreDisplay'
 
 import HoldQueueDisplay from './hold-queue/HoldQueueDisplay'
 
 import PlayfieldGridOverlay from './playfield/PlayfieldGridOverlay'
-import { AppState } from '../../../../../../types/frontend/shared'
 import { useSelector } from 'react-redux'
-import { getGameState } from '../../../redux/reducers/gameState'
+import { getGameState } from 'multiplayer-tetris-redux'
 
 const PlayView = () => {
 

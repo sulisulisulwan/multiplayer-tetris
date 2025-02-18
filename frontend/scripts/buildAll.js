@@ -50,6 +50,7 @@ const electronConfig = {
 
 // COMPOSE REACT WEBPACK CONFIG
 
+
 const users = [
   'sulwaaan',
   'berry',

@@ -9,6 +9,7 @@
     "clear:nm": "rm -r ./node_modules; rm -r ./package-lock.json; npm i",
     "build:all": "node ./scripts/buildAll.js",
     "build:react": "node ./scripts/buildReact.js",
+    "build:assets": "node ./scripts/buildReactAndAssets.js",
     "build:electron": "node ./scripts/buildElectron.js",
     "start:sulwaaan": "electron . -DEV sulwaaan",
     "start:berry": "electron . -DEV berry",
@@ -41,6 +42,8 @@
     "webpack-cli": "^6.0.1"
   },
   "dependencies": {
+    "multiplayer-tetris-core": "file:../core",
+    "multiplayer-tetris-redux": "file:../redux",
     "@reduxjs/toolkit": "^2.5.1",
     "@sulimantekalli/mycustomhooks": "^1.0.4",
     "@types/react-redux": "^7.1.34",

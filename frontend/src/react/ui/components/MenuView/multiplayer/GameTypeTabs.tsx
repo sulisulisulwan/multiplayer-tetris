@@ -3,9 +3,7 @@ import ModalWrapper from '../../sharedComponents/modal/ModalWrapper'
 import WebsocketBrowser from '../../../../sockets/websocket/WebsocketBrowser'
 import HoverButton from '../../sharedComponents/HoverButton'
 import { useSelector } from 'react-redux'
-import { getUserState } from '../../../../redux/reducers/user'
-import { getPartyState } from '../../../../redux/reducers/party'
-import { MultiplayerGameTypes } from 'multiplayer-tetris-types'
+import { getUserState, getPartyState } from 'multiplayer-tetris-redux'
 import { soundEffects } from '../../../../App'
 
 type MultiplayerGameTypeTab = {

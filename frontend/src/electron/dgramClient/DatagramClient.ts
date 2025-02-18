@@ -1,65 +1,64 @@
 import * as dgram from 'dgram'
 import { SocketDataItem } from 'multiplayer-tetris-types'
 import ElectronApp from '../ElectronApp'
-import { DgramServerToClient } from 'multiplayer-tetris-types/shared/types'
+import { ClientToElectronActions, DgramServerToClient, SocketDataItemDgram, UserId } from 'multiplayer-tetris-types/shared/types'
+import chalk = require('chalk')
 const { ipcMain } = require('electron')
 
 class DatagramClient {
 
   protected app: ElectronApp
-  protected client: dgram.Socket
+  protected socketClient: dgram.Socket
   protected serverAddress: string
   protected serverPort: number
+  protected userId: UserId
 
   constructor(serverAddress: string, serverPort: number, electronApp: ElectronApp) {
-    console.log('Electron App opening Dgram port on: ', serverPort)
     this.app = electronApp
-    this.client = dgram.createSocket('udp4')
+    this.socketClient = null
     this.serverAddress = serverAddress
     this.serverPort = serverPort
-    this.initListeners()
-    this.handleMessage.bind(this)
+    this.userId = null
   }
+
+  getSocket() {
+    return this.socketClient
+  }
+
+  initSocket(request?: SocketDataItem<ClientToElectronActions>) {
+    this.userId = request.data
+    console.log(chalk.yellow('Initializing Dgram connection...'))
+    this.socketClient = dgram.createSocket('udp4')
+    this.initListeners()
+  }
+
+  killSocket() {
+    this.socketClient.disconnect()
+  }
+
 
   initListeners() {
-    this.client.on('message', (msg, rinfo) => this.handleMessage(msg, rinfo))
+    this.socketClient.on('message', (msg, rinfo) => {
+      const socketDataItem = JSON.parse(msg.toString())
+      this.app.getWindow().webContents.send('dgram:in', socketDataItem)
+    })
+    
+    this.sendData({
+      userId: this.userId,
+      action: 'trackThisUser',
+      data: null
+    })
   }
 
-  handleMessage(msg: Buffer, rinfo: dgram.RemoteInfo) {
-    const msgData = JSON.parse(msg.toString())
-    const { action, data } = msgData
-    const handlerMethodName =`_handle_${action}`
-    const handler = this[handlerMethodName as keyof DatagramClient].bind(this)
-    console.log('DGRAM CLIENT RECEIVED GAMESTATE UPDATE')
-    console.log('SENDING DATA TO ELECTRON BRIDGE VIA "dgram:in"')
-    console.log(msgData)
-    handler(msgData)
+  sendData(socketDataItem: SocketDataItemDgram<any>) {
+    this.socketClient.send(JSON.stringify(socketDataItem), this.serverPort, this.serverAddress)
   }
 
-  sendData(data: SocketDataItem<DgramServerToClient>) {
-    console.log('DGRAM CLIENT SENDING DATA TO SERVER: ')
-    console.log(data)
-    this.client.send(JSON.stringify(data), this.serverPort, this.serverAddress, () => {})
-  }
 
-  _handle_getActivePlayers(data: SocketDataItem<DgramServerToClient>) {
-    this.app.getWindow().webContents.send('dgram:in', data)
-  }
-  _handle_updateClientGameState(data: SocketDataItem<DgramServerToClient>) {
-    this.app.getWindow().webContents.send('dgram:in', data)
-  }
-
-  _handle_poll(data: SocketDataItem<DgramServerToClient>) {
-    this.app.getWindow().webContents.send('dgram:in', data)
-    this.sendData({ action: 'poll_OK', data: null })
-  }
-
-  kill() {
-    try {
-      this.client.disconnect()
-    } catch(e){ 
-      console.error(e.message)
-    }
+  async kill() {
+    console.log(chalk.yellow('Killing Dgram connection...'))
+    await this.socketClient.disconnect()
+    this.socketClient = null
   }
 }
 

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useOutsideAlerter } from '../../hooks/useOutsideAlerter'
 import WebsocketBrowser from '../../../sockets/websocket/WebsocketBrowser'
-import { AppState, ChatMessageData } from 'multiplayer-tetris-types'
+import { ChatMessageData } from 'multiplayer-tetris-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { 
   getChatState, 
@@ -9,10 +9,10 @@ import {
   resetChatRecipientState, 
   setChatRecipientToCommitUserWhisper, 
   setChatRecipientToAll,
-  setChatRecipientToTypeUserWhisper
-} from '../../../redux/reducers/chat'
-import { getUserState } from '../../../redux/reducers/user'
-import { getPartyState } from '../../../redux/reducers/party'
+  setChatRecipientToTypeUserWhisper,
+  getUserState,
+  getPartyState
+} from 'multiplayer-tetris-redux'
 
 
 const ChatWindow = () => {
@@ -68,7 +68,7 @@ const ChatWindow = () => {
       data: newChatMessageData
     })
 
-    dispatch(resetChatRecipientState())
+    dispatch(resetChatRecipientState(undefined))
     setChatInput('')
   }
 
@@ -320,7 +320,7 @@ const ChatWindow = () => {
 
                 if (e.key === 'Escape') {
                   e.preventDefault()
-                  dispatch(resetChatRecipientState())
+                  dispatch(resetChatRecipientState(undefined))
                   return setWhisperRecipient('')
                 }
 
@@ -335,7 +335,7 @@ const ChatWindow = () => {
                 }
 
                 if(e.ctrlKey) {
-                  return dispatch(setChatRecipientToTypeUserWhisper())
+                  return dispatch(setChatRecipientToTypeUserWhisper(undefined))
                 }
 
                 if (!chatInput) return setChatInputToFocused(false)

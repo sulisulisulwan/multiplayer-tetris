@@ -1,9 +1,8 @@
 import * as React from 'react'
 import HoverButton from '../../sharedComponents/HoverButton'
 import MenuOptionWrapper from '../MenuOptionWrapper'
-import { AppState, SetAppState } from '../../../../../../../types/frontend/shared'
 import { useDispatch } from 'react-redux'
-import { setView, setViewToMainMenu } from '../../../../redux/reducers/view'
+import { setView, setViewToMainMenu } from 'multiplayer-tetris-redux'
 import SingleplayerGameTypeTabs from './SingleplayerGameTypeTabs'
 import { soundEffects } from '../../../../App'
 

@@ -4,8 +4,7 @@ import WebsocketBrowser from '../../../../../sockets/websocket/WebsocketBrowser'
 import { UserDataFromAPI, UserDataFromDB } from 'multiplayer-tetris-types'
 import ModalWrapper from '../../../sharedComponents/modal/ModalWrapper'
 import { useSelector } from 'react-redux'
-import { getPartyState } from '../../../../../redux/reducers/party'
-import { getUserState } from '../../../../../redux/reducers/user'
+import { getPartyState, getUserState } from 'multiplayer-tetris-redux'
 import { useContextMenuModal } from '../../../../hooks/useContextMenuModal'
 
 

@@ -1,48 +1,93 @@
 import * as Dgram from 'node:dgram'
-import ClientPool from './ClientPool.js'
-import MessageHandler from './MessageHandler.js'
+import MessageHandler from './DgramMessageHandler.js'
+import { SocketDataItem, SocketId, UserId } from 'multiplayer-tetris-types'
+import { DgramServerToClient, SocketDataItemDgram } from 'multiplayer-tetris-types/shared/types.js'
+import chalk = require('chalk')
 
 export default class Server {
-
-  protected dgram: Dgram.Socket
-  protected clientPool: ClientPool
+  
+  protected port: number
+  protected db: any
+  protected remoteAddressInfo: {
+    userId: Record<UserId, any>
+    remoteAddressInfo: Record<string, UserId>
+  }
   protected messageHandler: MessageHandler
+  protected server: Dgram.Socket
 
   constructor() {
-    this.dgram = Dgram.createSocket('udp4')
-    this.clientPool = new ClientPool()
-    this.messageHandler = new MessageHandler()
+    this.port = 41234
+    this.db = null
+    this.remoteAddressInfo = {
+      userId: {},
+      remoteAddressInfo: {}
+    }
+    this.messageHandler = new MessageHandler(this)
+    this.server = Dgram.createSocket('udp4')
+    this.initListeners()
   }
 
-  init(port: number) {
-    this.clientPool.init(this)
-    this.messageHandler.init(this)
+  public setUserIdToRemoteAddressInfo(userId: UserId, rinfo: Dgram.RemoteInfo) {
+    this.remoteAddressInfo.userId[userId] = rinfo
+    this.remoteAddressInfo.remoteAddressInfo[`${rinfo.address}:${rinfo.port}`] = userId
+  }
 
-    this.dgram
-      .on('error', (err: Error) => console.error(err))
-      .on('message', this.messageHandler.handleMessage.bind(this.messageHandler))
+  public getUserIdByRemoteAddressInfo(rinfo: Dgram.RemoteInfo) {
+    return this.remoteAddressInfo.remoteAddressInfo[`${rinfo.address}:${rinfo.port}`] || null
+  }
+
+  public getRemoteAddressInfoByUserId(userId: UserId) {
+    return this.remoteAddressInfo.userId[userId]
+  }
+
+  public to(roomId: string) {
+    console.log('need to implement public to(roomId: string)')
+    return {
+      emit(action: string, socketDataItem: SocketDataItem<DgramServerToClient>) {
+
+      }
+    }
+  }
+
+  private initListeners() {
+    const onMessage = this.onMessage.bind(this)
+    const onDisconnect = this.onDisconnect.bind(this)
+    this.server
       .on('listening', () => {
-        const { address, port } = this.dgram.address()
-        console.log(`gameServer listening on ${address}:${port}`)
+        const { address, port } = this.server.address()
+        console.log(`DgramServer listening on ${address}:${port}`)
       })
-      .on('connect', () => {
-        console.log('CONNECTING DGRAM')
+      .on('message', (bufferData, rinfo) => { 
+        const socketDataItem = JSON.parse(bufferData.toString()); 
+        onMessage(rinfo, socketDataItem) 
       })
-      .bind(port)
+      .on('disconnect', onDisconnect)
+      .on('error', (err: Error) => console.error(err))
+      .bind(this.port)
   }
+
+
+  // private async send(socket: Socket, socketDataItem: SocketDataItem<DgramServerToClient>) {
+  public async send(rinfo: Dgram.RemoteInfo, socketDataItem: SocketDataItem<DgramServerToClient>) {
+    const { port, address } = rinfo
+    console.log(`${chalk.blue('DGRAM Message')} to ${chalk.bgYellow(this.getUserIdByRemoteAddressInfo(rinfo))}: ${chalk.greenBright(socketDataItem.action)}`)
+    this.server.send(JSON.stringify(socketDataItem), port, address)
+  }
+
+  // private async onMessage(socket: Socket, action: string, data: any) {
+  private async onMessage(rinfo: Buffer, socketDataItem: SocketDataItemDgram<any>) {
+    if (!socketDataItem.action) return
+    const { action, userId } = socketDataItem
+    console.log(`${chalk.blue('DGRAM Message')} from ${chalk.bgYellow(userId)}: ${chalk.magentaBright(action)}`)
+    const handler = this.messageHandler.getHandler(action)
+    await handler(rinfo, socketDataItem)
+  }
+  // private async onDisconnect(socket: Socket) {}
+  private async onDisconnect(socket: any) {}
 
   getSocket() {
-    return this.dgram
+    return this.server
   }
 
-  getClientPool() {
-    return this.clientPool
-  }
-
-  sendMessage(rinfo: Dgram.RemoteInfo, data: string) {
-    const { port, address } = rinfo
-    console.log('sending to client ', `${address + port} message: ${data}`)
-    this.dgram.send(data, port, address)
-  }
 }
 

@@ -22,7 +22,8 @@ import {
   CoopSlotsQueueing,
   SlotType,
   SocketDataItem,
-  ChatMessageData
+  ChatMessageData,
+  SocketDataItemDgram
 } from './shared'
 
 // BACKEND
@@ -42,7 +43,8 @@ import {
 
 // ELECTRON
 import {
-  HandlerConfig
+  HandlerConfig,
+  ElectronWindow
 } from './electron'
 
 // FRONTEND
@@ -108,7 +110,8 @@ import {
   ScoreItem,
   ScoringHistoryPerCycle,
   ScoringMethods,
-  SetAppState,
+  ChatState,
+  PartyState,
   SharedHandlersMap,
   SharedScope,
   SingleplayerLocalGameState,
@@ -123,6 +126,10 @@ import {
   UpdateScore,
   ReduxActionObj,
 } from './frontend'
+
+export {
+  ElectronWindow
+}
 
 export {
   UserId,
@@ -147,7 +154,8 @@ export {
   CoopSlotsQueueing,
   SlotType,
   SocketDataItem,
-  ChatMessageData
+  ChatMessageData,
+  SocketDataItemDgram
 }
 
 export {
@@ -227,7 +235,8 @@ export {
   ScoreItem,
   ScoringHistoryPerCycle,
   ScoringMethods,
-  SetAppState,
+  ChatState,
+  PartyState,
   SharedHandlersMap,
   SharedScope,
   SingleplayerLocalGameState,

@@ -15,8 +15,8 @@ export const viewSlice =  createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initializeSinglePlayerGame, () => 'gameActive')
-      .addCase(initializeMultiplayerGame, () => 'matchFound')
+      .addCase<any>(initializeSinglePlayerGame, () => 'gameActive')
+      .addCase<any>(initializeMultiplayerGame, () => 'matchFound')
   }
 })
 

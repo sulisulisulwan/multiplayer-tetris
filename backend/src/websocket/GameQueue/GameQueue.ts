@@ -147,7 +147,7 @@ class OneVAllQueue extends GameQueue {
   public enqueueParty(partyData: PartyRoomDataAPI) {
     const queue = this.getAppropriateQueue(partyData)
     queue.unshift(partyData)
-    setTimeout(this.matchPartys.bind(this), 5000)
+    setTimeout(this.matchPartys.bind(this), 500)
   }
   
   
@@ -163,8 +163,6 @@ class OneVAllQueue extends GameQueue {
   }
 
   protected matchPartys() {
-    console.log('this.queues.solo', this.queues.solo)
-    console.log('this.queues.coop', this.queues.coop)
     if (this.queues.solo.length && this.queues.coop.length) {
       const party1 = this.queues.solo.pop()
       const party2 = this.queues.coop.pop()
@@ -255,7 +253,7 @@ class OneVOneQueue extends GameQueue {
   
   public enqueueParty(partyData: PartyRoomDataAPI) {
     this.queue.unshift(partyData)
-    setTimeout(this.matchPartys.bind(this), 5000)
+    setTimeout(this.matchPartys.bind(this), 500)
   }
   
   

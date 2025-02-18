@@ -24,8 +24,6 @@ import {
   GameOver,
 } from '.'
 import { HoldQueue } from '../hold-queue/HoldQueue'
-import SoundEffects from '../audio/SoundEffects'
-import BackgroundMusic from '../audio/BackgroundMusic'
 import { GamePhases, InitialOptions, SharedHandlersMap } from 'multiplayer-tetris-types/frontend'
 import { AppState } from 'multiplayer-tetris-types/frontend/shared'
 import { Dispatch } from 'redux'
@@ -33,8 +31,6 @@ import { Dispatch } from 'redux'
 export class Engine {
 
   public inGamePlayerControl: InGamePlayerControl
-  public soundEffects: SoundEffects
-  public backgroundMusic: BackgroundMusic
   private tetriminoMovementHandlersMap: Map<string, any>
   private phases: GamePhases
   private currentPhaseName: string

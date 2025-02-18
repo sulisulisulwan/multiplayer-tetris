@@ -74,12 +74,13 @@ import {
   UpdateScore,
 } from "./core" // EXPORT THESE
 
-import { AppState, SetAppState, ReduxActionObj } from "./shared"
+import { AppState, ChatState, PartyState, ReduxActionObj } from "./shared"
 
 // SHARED
 export {
   AppState,
-  SetAppState,
+  ChatState,
+  PartyState,
   ReduxActionObj
 }
 

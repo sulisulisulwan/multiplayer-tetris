@@ -3,7 +3,7 @@ import * as React from "react"
 import * as ReactDom from "react-dom/client"
 import App from "../App"
 import buildUserEnv from "../ui/dummydata/buildUserEnv"
-import store from "../redux/store"
+import { store } from "multiplayer-tetris-redux"
 import { Provider } from "react-redux"
 
 const container = document.getElementById("app")

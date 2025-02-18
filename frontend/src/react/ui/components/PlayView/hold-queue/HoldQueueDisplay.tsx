@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import TetriminoTile from '../TetriminoTile'
 import { tetriminoGraphics } from '../tetriminoGraphics'
-import { HoldQueueState, TetriminoGraphicsMap } from '../../../../../../../types/frontend'
+import { HoldQueueState, TetriminoGraphicsMap } from 'multiplayer-tetris-types'
 
 interface HoldQueueDisplayProps {
   holdQueue: HoldQueueState

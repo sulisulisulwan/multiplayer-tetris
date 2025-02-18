@@ -1,8 +1,7 @@
-import { Action, createSlice } from "@reduxjs/toolkit";
-import { AppState, ChatMessageData, ReduxActionObj, UserId } from "multiplayer-tetris-types";
-import { ActionCreator } from "redux";
+import { createSlice, CaseReducer } from "@reduxjs/toolkit";
+import { AppState, ChatMessageData, ChatState, ReduxActionObj, UserId } from "multiplayer-tetris-types";
 
-export const chatSlice =  createSlice({
+export const chatSlice =  createSlice<ChatState, Record<string, CaseReducer<ChatState, { payload: any; type: string; }>>, any, any>({
   name: 'chat',
   initialState: {
     messages: [],
@@ -13,6 +12,37 @@ export const chatSlice =  createSlice({
     }
   },
   reducers: {
+    activateChat: (chatState, action: { type: string, payload: { shiftKey: boolean, ctrlKey: boolean }}) => {
+      const { shiftKey, ctrlKey } = action.payload
+      return {
+        ...chatState,
+        inputFocused: true,
+        to: {
+          chatType: shiftKey ? 'all' : ctrlKey ? 'whisper' : 'party',
+          recipient: null
+        }
+      }
+    },
+    activateChatToWhisper: (chatState, action: { type: string, payload: any}) => {
+      return {
+        ...chatState, 
+        inputFocused: true,
+        to: {
+          chatType: 'whisper',
+          recipient: null
+        }
+      }
+    },
+    deactivateChat: (chatState, action: { type: string, payload: any}) => {
+      return {
+        ...chatState, 
+        inputFocused: false,
+        to: {
+          chatType: 'party',
+          recipient: null
+        }
+      } 
+    },
     setChatInputToFocus: (chatState, action: { type: string, payload: boolean }) => {
       chatState.inputFocused = action.payload
     },
@@ -53,6 +83,9 @@ export const chatSlice =  createSlice({
 
 export const getChatState = (state: AppState) => state.chat
 export const { 
+  activateChat,
+  activateChatToWhisper,
+  deactivateChat,
   setChatInputToFocus, 
   resetChatRecipientState, 
   setChatRecipientToTypeUserWhisper,

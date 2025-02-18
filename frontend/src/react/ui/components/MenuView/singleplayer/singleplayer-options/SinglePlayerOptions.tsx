@@ -5,13 +5,10 @@ import RangeField from '../../../sharedComponents/RangeField'
 import ToggleField from '../../../sharedComponents/ToggleField'
 import MenuOptionWrapper from '../../MenuOptionWrapper'
 import RangeSliderField from '../../../sharedComponents/RangeSliderField'
-import { SingleplayerOptions } from '../../../../../../../../types/frontend'
-import { useSelector } from 'react-redux'
-import { getGameState, updateGameOptionFieldValue, updateRangeValue, updateToggleField, updateVolume } from '../../../../../redux/reducers/gameState'
-import { useDispatch } from 'react-redux'
-import { setView } from '../../../../../redux/reducers/view'
+import { SingleplayerOptions } from 'multiplayer-tetris-types'
 import { Dispatch } from 'redux'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { getGameState, setView, updateGameOptionFieldValue, updateRangeValue, updateToggleField, updateVolume } from 'multiplayer-tetris-redux'
 
 const lockModes = ['extended', 'classic', 'infinite']
 const songs = [

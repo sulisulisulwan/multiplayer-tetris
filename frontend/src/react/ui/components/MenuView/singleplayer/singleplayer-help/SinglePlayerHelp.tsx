@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import MenuOptionWrapper from '../../MenuOptionWrapper'
 import { useDispatch } from 'react-redux'
-import { setView } from '../../../../../redux/reducers/view'
+import { setView } from 'multiplayer-tetris-redux'
 
 
 const Help = () => {

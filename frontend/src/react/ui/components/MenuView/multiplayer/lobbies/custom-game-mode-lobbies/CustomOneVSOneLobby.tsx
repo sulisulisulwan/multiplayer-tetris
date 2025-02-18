@@ -6,8 +6,7 @@ import { findDataInElementOrParent } from '../../../../../../../utils/findDataIn
 import WebsocketBrowser from '../../../../../../sockets/websocket/WebsocketBrowser'
 import { OneVOneSlotsCustom, UserDataFromAPI, UserDataFromDB } from 'multiplayer-tetris-types'
 import { useSelector } from 'react-redux'
-import { getPartyState } from '../../../../../../redux/reducers/party'
-import { getUserState } from '../../../../../../redux/reducers/user'
+import { getPartyState, getUserState } from 'multiplayer-tetris-redux'
 import { useContextMenuModal } from '../../../../../hooks/useContextMenuModal'
 import { soundEffects } from '../../../../../../App'
 

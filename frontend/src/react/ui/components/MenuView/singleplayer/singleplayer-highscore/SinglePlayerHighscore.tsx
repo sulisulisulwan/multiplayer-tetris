@@ -1,21 +1,9 @@
 import * as React from 'react'
 
 import MenuOptionWrapper from '../../MenuOptionWrapper'
-import { AppState, SetAppState } from '../../../../../../../../types/frontend/shared'
 import { useDispatch } from 'react-redux'
-import { setView } from '../../../../../redux/reducers/view'
+import { setView } from 'multiplayer-tetris-redux'
 
-interface HighScoreProps {
-  appState: AppState
-  setAppState: SetAppState
-}
-
-interface HighScoreData {
-  name: string
-  score?: number
-  level?: number
-  goalAttained?: number
-}
 
 //TODO:  We should be able to cycle through different high score tables for each game variation
 

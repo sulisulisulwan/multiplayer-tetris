@@ -21,10 +21,12 @@ import {
   OnePlayerSlotsQueueing,
   CoopSlotsQueueing,
   SocketDataItem,
-  ChatMessageData
+  ChatMessageData,
+  SocketDataItemDgram
 } from './types'
 
 export {
+  SocketDataItemDgram,
   UserId,
   RoomId,
   GameId,

@@ -1,11 +1,9 @@
 import * as React from 'react'
 import HoverButton from '../HoverButton'
 import WebsocketBrowser from '../../../../sockets/websocket/WebsocketBrowser'
-import { AppState, SetAppState } from '../../../../../../../types/frontend/shared'
 import { UserDataFromAPI } from 'multiplayer-tetris-types'
 import { useSelector } from 'react-redux'
-import { getPartyState } from '../../../../redux/reducers/party'
-import { getUserState } from '../../../../redux/reducers/user'
+import { getPartyState, getUserState } from 'multiplayer-tetris-redux'
 
 type InviteModalProps = {
   setModalClosed: React.MouseEventHandler<HTMLButtonElement>,

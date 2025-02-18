@@ -83,6 +83,12 @@ export type SocketDataItem<K> = {
   data: any | Record<string, any>
 }
 
+export type SocketDataItemDgram<K> = {
+  userId: UserId // for DGRAM ONLY
+  action: K
+  data: any | Record<string, any>
+}
+
 export type ServerToClientActions = 
   'confirmedLoggedIn' | 'sendAllFriends' | 
   'updateFriendsData' | 'sendPartyRoomId' | 
@@ -107,7 +113,8 @@ export type ClientToServerActions =
 export type ClientToElectronActions =
   'initSocket'
 
-export type DgramServerToClient = any
+export type DgramServerToClient = 
+  'trackingUser' 
 
 export type ClientToDgramServer = any
 

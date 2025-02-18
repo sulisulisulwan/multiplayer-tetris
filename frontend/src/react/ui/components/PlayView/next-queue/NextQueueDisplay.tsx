@@ -2,7 +2,7 @@ import * as React from "react";
 import TetriminoTile from '../TetriminoTile'
 import { levelColors } from '../levelColors'
 import { tetriminoGraphics } from "../tetriminoGraphics"; 
-import { TetriminoGraphicsMap } from "../../../../../../../types/frontend";
+import { TetriminoGraphicsMap } from "multiplayer-tetris-types";
 
 interface NextQueueDisplayProps {
   nextQueueData: string[]

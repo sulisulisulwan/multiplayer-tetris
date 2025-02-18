@@ -1,9 +1,8 @@
 import * as React from 'react'
 import HoverButton from '../../sharedComponents/HoverButton'
 import { useSelector } from 'react-redux'
-import { getUserState } from '../../../../redux/reducers/user'
 import { soundEffects } from '../../../../App'
-import { getGameState } from '../../../../redux/reducers/gameState'
+import { getGameState } from 'multiplayer-tetris-redux'
 
 type SingleplayerGameTypeTab = {
   displayName: 'MARATHON' | 'SPRINT' | 'ULTRA'

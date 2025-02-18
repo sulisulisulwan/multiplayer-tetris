@@ -4,8 +4,7 @@ import WebsocketBrowser from "../../../../../sockets/websocket/WebsocketBrowser"
 import HoverButton from "../../../sharedComponents/HoverButton"
 import PlayerSocialCard from "./PlayerSocialCard"
 import * as React from 'react'
-import { getUserState } from "../../../../../redux/reducers/user"
-import { getPartyState } from "../../../../../redux/reducers/party"
+import { getUserState, getPartyState } from "multiplayer-tetris-redux"
 
 const SocialList = () => {
 

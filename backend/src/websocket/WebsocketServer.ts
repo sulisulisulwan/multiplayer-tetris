@@ -3,7 +3,7 @@ import dbApi, { DatabaseAPI } from "../db/db.js";
 import MessageHandler from "./MessageHandler/WebsocketMessageHandler.js";
 import chalk from "chalk";
 import { SocketDataItem, SocketId, UserId } from "multiplayer-tetris-types";
-import { DgramServerToClient } from "multiplayer-tetris-types/shared/types.js";
+import { DgramServerToClient, ServerToClientActions } from "multiplayer-tetris-types/shared/types.js";
 import { DecorateAcknowledgementsWithMultipleResponses, DefaultEventsMap } from "socket.io/dist/typed-events.js";
 import GameQueue from "./GameQueue/GameQueue.js";
 
@@ -23,7 +23,6 @@ class WebsocketServer {
   constructor() {
     this.port = 3001
     this.db = dbApi
-    console.log('Websocket server connected on ' + this.port)
     this.openSockets = {
       userId: {},
       socketId: {},
@@ -32,6 +31,7 @@ class WebsocketServer {
     this.messageHandler = new MessageHandler(this)
     this.queueingService = new GameQueue(this)
     this.initListeners()
+    console.log('Websocket server connected on ' + this.port)
   }
 
   public getUserIdBySocketId(socketId: SocketId) {
@@ -108,7 +108,7 @@ class WebsocketServer {
     this.send(socket, { action: 'confirmedLoggedIn', data: { user: userData, party: partyRoomData } })
   }
 
-  private async send(socket: Socket, socketDataItem: SocketDataItem<DgramServerToClient>) {
+  private async send(socket: Socket, socketDataItem: SocketDataItem<ServerToClientActions>) {
     console.log(`Message to ${chalk.bgYellow(this.openSockets.socketId[socket.id])}: ${chalk.greenBright(socketDataItem.action)}`)
     const { action, data } = socketDataItem
     socket.emit('messageFromServer', { action, data })

@@ -15,8 +15,10 @@ import Off from './phases/Off'
 import GameOver from './phases/GameOver'
 import BasePhase from './phases/BasePhase'
 import UpdateScore from './phases/UpdateScore'
+import { Engine } from './Engine'
 
 export {
+  Engine,
   BasePhase,
   Animate,
   Completion,

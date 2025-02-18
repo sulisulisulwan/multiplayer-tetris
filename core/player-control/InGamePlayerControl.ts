@@ -56,7 +56,7 @@ export class InGamePlayerControl extends SharedScope {
 
   }
 
-  public keystrokeHandler(gameState: AppState['gameState'], dispatch: Dispatch<any>, e: React.KeyboardEvent) {
+  public keystrokeHandler(e: React.KeyboardEvent, gameState: AppState['gameState'], dispatch: Dispatch<any>) {
     // this.syncToReactAppState(gameState)
     
     if (!['falling', 'lock'].includes(gameState.currentGamePhase)) {

@@ -1,6 +1,6 @@
-import { BroadcastOperator, Socket } from "socket.io"
 import db, { DatabaseAPI } from "../../db/db.js"
 import WebsocketServer from "../WebsocketServer.js"
+import { Socket } from "socket.io"
 import { NonMainRoomTypes, SocketDataItem } from "multiplayer-tetris-types"
 import { MultiplayerGameTypes, PartyId, RoomId, RoomTypes, UserId } from "multiplayer-tetris-types"
 import { PartyRoomDataAPI } from "multiplayer-tetris-types"

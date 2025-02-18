@@ -1,28 +1,31 @@
 import * as React from 'react'
-import { Engine } from './core/engine/Engine'
-
-import { makeCopy } from './core/utils/utils'
+import { AppState } from 'multiplayer-tetris-types'
+import { useDispatch, useSelector } from 'react-redux'
+import { 
+  Engine,
+  makeCopy, 
+  allSoundEffects, 
+  allBackgroundMusic, 
+  BackgroundMusic, 
+  SoundEffects, 
+  MenuPlayerControl
+} from 'multiplayer-tetris-core'
+import { 
+  getUserState ,
+  getViewState,
+  getGameState, 
+  initializeSinglePlayerGame, 
+  getMultiplayerGameState, 
+  getPartyState,
+  getChatState
+} from 'multiplayer-tetris-redux'
 import { getView } from './allGetsAndSets/getView'
 import { getBackgrounds } from './allGetsAndSets/getBackgrounds'  
 import ChatWindow from './ui/components/Chat/ChatWindow'
-import MenuPlayerControl from './core/player-control/MenuPlayerControl' 
 import DgramBrowser from './sockets/dgram/DgramBrowser' 
-import contentEqual from '../utils/contentEqual' 
-import WebsocketBrowser from './sockets/websocket/WebsocketBrowser' 
-import { AppState } from '../../../types/frontend/shared'
-import SoundEffects from './core/audio/SoundEffects'
-import { useDispatch } from 'react-redux'
-import { useSelector } from 'react-redux'
-import { getUserState } from './redux/reducers/user'
-import { getViewState } from './redux/reducers/view'
-import { getGameState, initializeSinglePlayerGame } from './redux/reducers/gameState'
+// import WebsocketBrowser from './sockets/websocket/WebsocketBrowser' 
 import { SocketDataItem } from 'multiplayer-tetris-types'
-import { allSoundEffects } from './core/audio/allSoundEffects'
-import BackgroundMusic from './core/audio/BackgroundMusic'
-import { allBackgroundMusic } from './core/audio/allBackgroundMusic'
 import { Dispatch } from 'redux'
-import { getMultiplayerGameState } from './redux/reducers/multiplayerGameState'
-import { getPartyState } from './redux/reducers/party'
     
 type AppStateSlices = {
   view: AppState['view'],
@@ -58,32 +61,38 @@ let menuPlayerControl: MenuPlayerControl = null
 let userState: AppState['user'] = null
 let viewState: AppState['view'] = null
 let gameState: AppState['gameState'] = null
+let chatState: AppState['chat'] = null
 let partyState: AppState['party'] = null
 let multiplayerGameState: AppState['multiplayerGameState'] = null
 let dispatch: Dispatch = null
 let currKeyStrokeHandler: (e: KeyboardEvent) => void = null
 
-let inGameHandleKeyStroke = (e: any) => {
-  engine.inGamePlayerControl.keystrokeHandler(gameState, dispatch, e)
-}
-let mainMenuHandleKeyStroke = (e: any) => {
-  menuPlayerControl.keystrokeHandler(null, e)
-}
+let inGameHandleKeyStroke = (e: any) => { engine.inGamePlayerControl.keystrokeHandler(e, gameState, dispatch) }
+let mainMenuHandleKeyStroke = (e: any) => { menuPlayerControl.keystrokeHandler(e, { chatState }, dispatch)}
 
-WebsocketBrowser.onMessage((msg: SocketDataItem<any>) => {
-  console.log(`Receiving message "${msg.action}" from server`)
-  const handler = WebsocketBrowser.getHandler(msg.action)  
+// WebsocketBrowser.onMessage((msg: SocketDataItem<any>) => {
+//   console.log(`Receiving message "${msg.action}" from server`)
+//   const handler = WebsocketBrowser.getHandler(msg.action)  
   
-  let state = {}
-  if (['updateFriendsData', 'playerDisconnected'].includes(msg.action)) {
-    state = { user: userState }
-  }
+//   let state = {}
+//   if (['updateFriendsData', 'playerDisconnected'].includes(msg.action)) {
+//     state = { user: userState }
+//   }
+
+//   handler({
+//     appState: state,
+//     socketSend: WebsocketBrowser.send.bind(WebsocketBrowser),
+//     msgData: msg.data
+//   })  
+// })
+
+DgramBrowser.onMessage((msg: SocketDataItem<any>) => {
+  console.log(`Receiving message "${msg.action}" from DGRAM server`)
+  const handler = DgramBrowser.getHandler(msg.action)
 
   handler({
-    appState: state,
-    socketSend: WebsocketBrowser.send.bind(WebsocketBrowser),
     msgData: msg.data
-  })  
+  })
 })
 
 
@@ -93,15 +102,9 @@ const App = React.memo((props: AppTestProps) => {
   viewState = useSelector(getViewState)
   gameState = useSelector(getGameState)
   partyState = useSelector(getPartyState)
+  chatState = useSelector(getChatState)
   multiplayerGameState = useSelector(getMultiplayerGameState)
 
-  const state: AppStateSlices = {
-    user: userState,
-    view: viewState,
-    party: partyState,
-    gameState: gameState,
-    multiplayerGameState: multiplayerGameState
-  }
 
   const { thisUserId } = props
   dispatch = useDispatch()
@@ -125,7 +128,7 @@ const App = React.memo((props: AppTestProps) => {
       const gameOptions = makeCopy(gameState.gameOptions)
       engine = new Engine(gameOptions)
       backgroundMusic.setTrack(gameState.gameOptions.backgroundMusic)
-      dispatch(initializeSinglePlayerGame())
+      dispatch(initializeSinglePlayerGame(undefined))
       return
     }
 
@@ -146,27 +149,32 @@ const App = React.memo((props: AppTestProps) => {
     currKeyStrokeHandler = mainMenuHandleKeyStroke
     document.addEventListener('keydown', currKeyStrokeHandler, true)
     document.addEventListener('keyup', currKeyStrokeHandler, true)
-    menuPlayerControl = new MenuPlayerControl(null)
-    WebsocketBrowser.init(thisUserId)
-    WebsocketBrowser.setReduxDispatcher(dispatch)
+    menuPlayerControl = new MenuPlayerControl()
+    // WebsocketBrowser.init(thisUserId)
+    // WebsocketBrowser.setReduxDispatcher(dispatch)
     soundEffects = new SoundEffects(allSoundEffects, 'sound-effects').addSoundsToDOM()
     backgroundMusic = new BackgroundMusic(allBackgroundMusic, 'background-music').addSoundsToDOM()
     return () => {
-      WebsocketBrowser.kill()
+      // WebsocketBrowser.kill()
     }
   }, [])
 
-  console.log(state)
   
   return (
     <>
-      {
+      {/* {
         (function(viewState) {
           const view = getView(viewState)
           return view 
         })(viewState)
       }
-      { userState ? <ChatWindow/> : null}
+      { userState ? <ChatWindow/> : null} */}
+      <div style={{ color: 'white' }}>
+        Let's figure out DGRAM
+        <button onClick={() => {
+          DgramBrowser.init(thisUserId)
+        }}>SEND DGRAM TO DGRAM</button>
+      </div>
     </>
   )
       

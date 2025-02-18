@@ -4,12 +4,8 @@ import {
   LevelGoals as LevelGoalsAbstract, 
   NextQueue as NextQueueAbstract, 
   TetriminoMovementHandler as TetriminoMovementHandlerAbstract,
-  BackgroundMusic as BackgroundMusicAbstract,
-  SoundEffects as SoundEffectsAbstract
 } from "multiplayer-tetris-types/frontend/core"
-import { AppState, SetAppState } from "multiplayer-tetris-types/frontend/shared"
 import { BaseScoringHandler } from "multiplayer-tetris-types/frontend/core"
-import { makeCopy } from "./utils/utils"
 
 export class SharedScope {
 

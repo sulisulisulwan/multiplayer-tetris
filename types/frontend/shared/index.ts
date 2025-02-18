@@ -8,28 +8,30 @@ export type ReduxActionObj<K> = {
   payload: K
 }
 
+export interface ChatState {
+  inputFocused: boolean
+  to: {
+    chatType: ChatTypes
+    recipient: string[]
+  }
+  messages: ChatMessageData[]
+}
+
+export interface PartyState {
+  id: string
+  gameId: string | null
+  slots: OneVOneSlotsCustom | OneVAllSlotsCustom | CoopSlotsCustom | OnePlayerSlotsQueueing | CoopSlotsQueueing
+  gameType: MultiplayerGameTypes
+  host: string 
+  status: GameStatus
+  users: string[] //user ids
+}
+
 export interface AppState {
   view: string
   gameState: SingleplayerLocalGameState | MultiplayerLocalGameState
   multiplayerGameState: any
   user: UserDataFromAPI
-  party: {
-    id: string
-    gameId: string | null
-    slots: OneVOneSlotsCustom | OneVAllSlotsCustom | CoopSlotsCustom | OnePlayerSlotsQueueing | CoopSlotsQueueing
-    gameType: MultiplayerGameTypes
-    host: string 
-    status: GameStatus
-    users: string[] //user ids
-  }
-  chat: {
-    inputFocused: boolean
-    to: {
-      chatType: ChatTypes
-      recipient: string[]
-    }
-    messages: ChatMessageData[]
-  }
+  party: PartyState
+  chat: ChatState
 }
-
-export type SetAppState = React.Dispatch<React.SetStateAction<AppState>>

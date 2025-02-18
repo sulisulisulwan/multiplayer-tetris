@@ -1,0 +1,19 @@
+{
+  "name": "multiplayer-tetris-core",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "multiplayer-tetris-types": "file:../types",
+    "multiplayer-tetris-redux": "file:../redux"
+  },
+  "dependencies": {
+    "@types/redux": "^3.6.31",
+    "redux": "^5.0.1"
+  }
+}
