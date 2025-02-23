@@ -114,9 +114,10 @@ export type ClientToElectronActions =
   'initSocket'
 
 export type DgramServerToClient = 
-  'trackingUser' 
+  'test' | 'trackingUser' | 'gameStateUpdate'
 
-export type ClientToDgramServer = any
+export type ClientToDgramServer = 
+  'trackThisUser' | 'activateGame' | 'handleKeyStroke'
 
 export type ChatMessageData = {
   id: number

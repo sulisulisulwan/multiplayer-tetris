@@ -1,16 +1,20 @@
 
+:root {
+  --playfield-square-side-size: 3.8vh;
+}
+
 .playfield-square {
-  height: 30px;
-  width: 30px;
-  opacity: .7;
+  height: calc((var(--playfield-square-side-size) / 5) + var(--playfield-square-side-size));
+  width: calc((var(--playfield-square-side-size) / 5) + var(--playfield-square-side-size));
+  background-color: rgba(0,0,0,.5);
+  /* opacity: .7; */
   z-index: 200;
 }
 
 .playfield-overlay-square {
   background-color: none;
-  height: 30px;
-  width: 30px;
-  /* opacity: .1; */
+  height: calc((var(--playfield-square-side-size) / 5) + var(--playfield-square-side-size));
+  width: calc((var(--playfield-square-side-size) / 5) + var(--playfield-square-side-size));
   z-index: 201
 }
 
@@ -18,9 +22,9 @@
   border-style: solid;
   border-color: midnightblue;
   border-radius: 20%;
-  border-width: 3px;
-  height: 25px;
-  width: 25px;
+  border-width: calc(var((--playfield-square-side-size) / 5) / 8);
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
   z-index: 203;
 }
 
@@ -41,44 +45,50 @@
   /* background-color: rgb(40,40,40); */
   background-color: white;
   opacity: .05;
-  height: 25px;
-  width: 25px;
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 
 .trail-1 {
   /* background-color: rgb(80,80,80); */
   background-color: white;
   opacity: .1;
-  height: 25px;
-  width: 25px;
+  /* height: 25px;
+  width: 25px; */
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 .trail-2 {
   /* background-color: rgb(120,120,120); */
   background-color: white;
   opacity: .2;
-  height: 25px;
-  width: 25px;
+  /* height: 25px;
+  width: 25px; */
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 .trail-3 {
   /* background-color: rgb(180,180,180); */
   background-color: white;
   opacity: .3;
-  height: 25px;
-  width: 25px;
+  /* height: 25px;
+  width: 25px; */
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 .trail-4 {
   /* background-color: rgb(220,220,220); */
   background-color: white;
   opacity: .4;
-  height: 25px;
-  width: 25px;
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 .trail-5 {
   /* background-color: rgb(255,255,255); */
   background-color: white;
   opacity: .7;
-  height: 25px;
-  width: 25px;
+  height: var(--playfield-square-side-size);
+  width: var(--playfield-square-side-size);
 }
 
 .ghostTet {

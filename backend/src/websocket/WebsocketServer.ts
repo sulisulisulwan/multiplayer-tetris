@@ -5,7 +5,7 @@ import chalk from "chalk";
 import { SocketDataItem, SocketId, UserId } from "multiplayer-tetris-types";
 import { DgramServerToClient, ServerToClientActions } from "multiplayer-tetris-types/shared/types.js";
 import { DecorateAcknowledgementsWithMultipleResponses, DefaultEventsMap } from "socket.io/dist/typed-events.js";
-import GameQueue from "./GameQueue/GameQueue.js";
+import GameQueue from "../GameQueue/GameQueue.js";
 
 class WebsocketServer {
   

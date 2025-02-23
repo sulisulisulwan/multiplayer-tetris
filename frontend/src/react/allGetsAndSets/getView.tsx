@@ -1,28 +1,27 @@
 import * as React from 'react'
-import PlayView from "../ui/components/PlayView/PlayView"
-import { 
-  SinglePlayer,
-  SinglePlayerOptions, 
-  SinglePlayerHighscore,
-  SinglePlayerHelp, 
-  MultiPlayer, 
-} from "../ui/components/MenuView"
-import MainMenuView from '../ui/components/MenuView/MainMenuView'
-import MatchFoundView from '../ui/components/MatchFoundView'
-import MultiplayerGameLoading from '../ui/components/MultiplayerGameLoading'
+import SingleplayerPlayView from "../ui/views/game-active/SingleplayerPlayView"
+import MainMenuView from '../ui/views/MainMenuView'
+import MatchFoundView from '../ui/views/MatchFoundView'
+import MultiplayerGameLoading from '../ui/views/MultiplayerGameLoading'
+import SinglePlayerMenu from '../ui/views/singleplayer-menu/SinglePlayerMenu'
+import MultiPlayerMenu from '../ui/views/multiplayer-menu/MultiPlayerMenu'
+import SinglePlayerOptions from '../ui/views/singleplayer-menu/singleplayer-options/SinglePlayerOptions'
+import SinglePlayerHighScore from '../ui/views/singleplayer-menu/singleplayer-highscore/SinglePlayerHighscore'
+import SinglePlayerHelp from '../ui/views/singleplayer-menu/singleplayer-help/SinglePlayerHelp'
 
 export function getView (viewState: string) {
+  console.log(viewState)
   const viewMap = new Map([
-    [ 'gameActive', <PlayView/> ],
+    [ 'gameActive_singleplayer', <SingleplayerPlayView/> ],
     [ 'matchFound', <MatchFoundView/> ],
     [ 'multiplayerGameLoading', <MultiplayerGameLoading/> ],
-    [ 'mainMenu', <MainMenuView/> ],
-    [ 'singleplayer', <SinglePlayer/> ],
-    [ 'multiplayer', <MultiPlayer/> ],
-    [ 'singleplayer_options', <SinglePlayerOptions/> ],
-    [ 'singleplayer_highscore', <SinglePlayerHighscore/> ],
-    [ 'singleplayer_help', <SinglePlayerHelp/> ],
-    [ 'loadGame', <div>LOADING</div> ],
+    [ 'menu_main', <MainMenuView/> ],
+    [ 'menu_singleplayer', <SinglePlayerMenu/> ],
+    [ 'menu_singleplayer_options', <SinglePlayerOptions/> ],
+    [ 'menu_singleplayer_highscore', <SinglePlayerHighScore/> ],
+    [ 'menu_singleplayer_help', <SinglePlayerHelp/> ],
+    [ 'menu_multiplayer', <MultiPlayerMenu/> ],
+    [ 'loadGame_singleplayer', <div>LOADING</div> ],
   ])
 
   return viewMap.get(viewState)

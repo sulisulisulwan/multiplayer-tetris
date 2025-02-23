@@ -1,0 +1,21 @@
+
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "commonjs",
+    "target": "ESNext",
+    "jsx": "react",
+    "allowJs": true,
+    
+    "moduleResolution": "node",
+    "declaration": true,
+    "declarationDir": "./@types",
+    "sourceMap": true
+  },
+  "files": [
+    "index.ts"
+  ]
+  
+}
+

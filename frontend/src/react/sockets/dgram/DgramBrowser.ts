@@ -1,6 +1,7 @@
 import { ElectronWindow } from "multiplayer-tetris-types/electron"
 import DgramBrowserMessageHandler from "./DgramBrowserMessageHandler"
-import { SocketDataItem, UserId } from "multiplayer-tetris-types"
+import { SocketDataItem, SocketDataItemDgram, UserId } from "multiplayer-tetris-types"
+import { ClientToDgramServer, DgramServerToClient } from "multiplayer-tetris-types/shared/types"
 
 class DgramBrowser {
   protected onReceive: any
@@ -23,12 +24,22 @@ class DgramBrowser {
     this.killSocket()
     this.sendMessage('dgram', { action: 'killSocket', data: null })
   }
+  
+  public setAddress(address: string) {
+    this.sendMessage('dgram', { action: 'setAddress', data: address })
+    
+  }
+  
+  public setPort(port: number) {
+    this.sendMessage('dgram', { action: 'setPort', data: port })
+
+  }
 
   public onMessage(callback: Function) {
     this.onReceive('dgram:in', callback)
   }
 
-  public send(data: SocketDataItem<DgramBrowser>) {
+  public send(data: SocketDataItemDgram<ClientToDgramServer>) {
     /**
      * data must have this format:
      * {
@@ -47,6 +58,10 @@ class DgramBrowser {
   public getHandler(action: string) {
     return this.messageHandler.getHandler(action)
   }
+}
+
+export {
+  DgramBrowser
 }
 
 export default new DgramBrowser()

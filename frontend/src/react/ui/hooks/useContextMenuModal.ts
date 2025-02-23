@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { MenuOptionGroup } from '../components/sharedComponents/modal/ContextMenuModal'
+import { MenuOptionGroup } from '../sharedComponents/modal/ContextMenuModal'
 
 export const useContextMenuModal = (optionGroups: MenuOptionGroup[],  optionHeight: number) => {
 

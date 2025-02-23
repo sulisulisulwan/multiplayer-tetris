@@ -5,7 +5,7 @@ const backgroundDiv = document.getElementById('background')
 let ranOnce = 0 //TODO: this is a hack
 
 const backgrounds = {
-  gameActive: () => {
+  gameActive_singleplayer: () => {
 
     //This gets run often during this phase, whenever setState is used.  consider moving background changing to useEffect-ish thing
     //We can also use this as an opportunity to change backgrounds for different levels!
@@ -33,6 +33,7 @@ const backgrounds = {
     }
     
   },
+  gameActive_multiplayer: () => {},
   matchFound() {
     backgroundDiv.childNodes.forEach((child) => {
       backgroundDiv.removeChild(child)
@@ -55,7 +56,7 @@ const backgrounds = {
   multiplayerGameLoading() {
     this.matchFound()
   },
-  mainMenu: () => {
+  menu_main: () => {
     backgroundDiv.childNodes.forEach((child) => {
       backgroundDiv.removeChild(child)
     })
@@ -109,24 +110,25 @@ const backgrounds = {
     blocksDiv.style.animationTimingFunction = 'linear'
   },
 
-  multiplayer: () => {
+  menu_multiplayer: () => {
     const overlayDiv = document.getElementById('overlayDiv-menuscreen')
     if (!overlayDiv) return
     overlayDiv.style.background = 'linear-gradient( rgba(0, 0, 0, 0.7), rgba(203, 149, 43, 0.7), rgba(0, 0, 0, 0.7))'
   },
   
-  singleplayer: () => {
+  menu_singleplayer: () => {
     const overlayDiv = document.getElementById('overlayDiv-menuscreen')
     if (!overlayDiv) return
     overlayDiv.style.background = 'linear-gradient( rgba(0, 0, 0, 0.7), rgba(0, 84, 14, 0.7), rgba(0, 0, 0, 0.7))'
   },
   
-  singleplayer_options: () => "#252525",
-  singleplayer_highscore: () => "#252525",
-  singleplayer_help: () => "#252525",
+  menu_singleplayer_options: () => "#252525",
+  menu_singleplayer_highscore: () => "#252525",
+  menu_singleplayer_help: () => "#252525",
   highScore: () => "#252525",
   help: () => "#252525",
-  loadGame: () => "black"
+  loadGame_singleplayer: () => "black",
+  loadGame_multiplayer: () => "black"
 }
 
 const activate = (backgroundColor: string) => {

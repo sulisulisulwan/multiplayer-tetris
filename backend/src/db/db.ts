@@ -1,6 +1,4 @@
 //this is a standin for a restAPI for user authentication and userData retrival
-import chalk from 'chalk'
-import * as crypto from 'crypto'
 import { 
   GameId, 
   SlotType, 
@@ -13,10 +11,11 @@ import {
   RoomData, RoomId, RoomsData, RoomTypes, UserId, UserStatus } from 'multiplayer-tetris-types'
 import { DatabaseAPIData } from 'multiplayer-tetris-types'
 import { RoomsDataWithoutMain } from 'multiplayer-tetris-types/backend'
-import { usersData } from './usersData'
-import { ChatMessageData, CoopSlotsQueueing, CustomPlayerSlots, OnePlayerSlotsQueueing, OneVAllSlotsCustom, OneVOneSlotsCustom, QueueingPlayerSlots, Slot, UserDataFromAPI, UserDataFromDB } from 'multiplayer-tetris-types/shared/types'
-import allMessages from './messages'
 import { GameRoomDataAPI, GameRoomDataFromDB, PartyRoomDataAPI } from 'multiplayer-tetris-types/backend/types'
+import { ChatMessageData, CoopSlotsQueueing, CustomPlayerSlots, OnePlayerSlotsQueueing, OneVAllSlotsCustom, OneVOneSlotsCustom, QueueingPlayerSlots, Slot, UserDataFromAPI, UserDataFromDB } from 'multiplayer-tetris-types/shared/types'
+import * as crypto from 'crypto'
+import { usersData } from './usersData.js'
+import allMessages from './messages.js'
 
 const makeCopy = (obj: any): any => {
   if (['number', 'string', 'boolean'].includes(typeof obj) || obj === null) return obj
@@ -96,11 +95,14 @@ class DatabaseAPI {
     this.data.chat.messages.push(chatMessage)
   }
 
-  async createGameRoom(gameType: MultiplayerGameTypes, party1: PartyRoomDataAPI, party2: PartyRoomDataAPI) {
+  
+
+  async createMultiplayerGameRoom(gameType: MultiplayerGameTypes, party1: PartyRoomDataAPI, party2: PartyRoomDataAPI) {
     const [gameModeOrQueuePlayerAmount, customOrQueueing, gameModeIfQueued] = gameType.split('-')
     const newGameRoomData: GameRoomDataFromDB = {
       id: crypto.randomUUID(),
       gameType,
+      gameState: {},
       party1: null,
       party2: null,
       slots: null,

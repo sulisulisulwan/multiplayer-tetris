@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { ChatMessageData, ChatTypes, CoopSlotsCustom, CoopSlotsQueueing, GameStatus, MultiplayerGameTypes, OnePlayerSlotsQueueing, OneVAllSlotsCustom, OneVOneSlotsCustom, UserDataFromAPI, UserStatus } from "../../shared"
-import { SingleplayerLocalGameState, MultiplayerLocalGameState } from "../core"
+import { SingleplayerLocalGameState, MultiplayerLocalGameState, GameOptions } from '../../'
 
 export type ReduxActionObj<K> = {
   action: string
@@ -30,8 +30,11 @@ export interface PartyState {
 export interface AppState {
   view: string
   gameState: SingleplayerLocalGameState | MultiplayerLocalGameState
-  multiplayerGameState: any
   user: UserDataFromAPI
   party: PartyState
   chat: ChatState
+  gameOptions: {
+    singleplayer: GameOptions
+    multiplayer: GameOptions
+  }
 }

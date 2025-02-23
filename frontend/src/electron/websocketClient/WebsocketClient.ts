@@ -24,7 +24,10 @@ class WebsocketClient {
   }
 
   killSocket() {
-    this.socketClient.disconnect()
+    if (this.socketClient) {
+      this.socketClient.disconnect()
+      this.socketClient = null
+    }
   }
 
   initListeners() {
@@ -57,10 +60,11 @@ class WebsocketClient {
   }
 
   async kill() {
-    console.log(chalk.yellow('Killing Websocket connection...'))
-    await this.socketClient.disconnect()
-    this.socketClient = null
-    return
+    if (this.socketClient) {
+      console.log(chalk.yellow('Killing Websocket connection...'))
+      await this.socketClient.disconnect()
+      this.socketClient = null
+    }
   }
 }
 

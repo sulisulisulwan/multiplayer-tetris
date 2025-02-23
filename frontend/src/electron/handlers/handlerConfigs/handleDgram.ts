@@ -13,6 +13,14 @@ const sendDgramData: HandlerConfig = {
       (this.dgramClient as DatagramClient).killSocket()
       return
     }
+    if (data.action === 'setAddress') {
+      (this.dgramClient as DatagramClient).setAddressTarget(data.data)
+      return
+    }
+    if (data.action === 'setPort') {
+      (this.dgramClient as DatagramClient).setServerPortTarget(data.data)
+      return
+    }
     
     this.dgramClient.sendData(data)
   }

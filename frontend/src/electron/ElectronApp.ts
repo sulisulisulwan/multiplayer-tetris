@@ -27,7 +27,7 @@ class ElectronApp {
   protected htmlDistPath: string
 
   constructor(htmlDistPath: string) {
-    this.dgramClient = new DatagramClient('localhost', 41234, this)
+    this.dgramClient = new DatagramClient(this)
     this.websocketClient = new WebsocketClient(this)
     this.window = null
     this.htmlDistPath = htmlDistPath

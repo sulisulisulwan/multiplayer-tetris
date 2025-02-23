@@ -54,6 +54,7 @@ import {
   Animate,
   AppState,
   Audio,
+  BaseTetrimino,
   AutoRepeat,
   BackgroundMusic,
   BaseAward,
@@ -87,7 +88,6 @@ import {
   LevelGoals,
   LineClearScoringDataItem,
   LineClearPatternDataItem,
-  LocalGameState,
   LockClassic,
   LockExtended,
   LockInfinite,
@@ -112,8 +112,6 @@ import {
   ScoringMethods,
   ChatState,
   PartyState,
-  SharedHandlersMap,
-  SharedScope,
   SingleplayerLocalGameState,
   StateUpdateItem,
   SingleplayerOptions,
@@ -125,13 +123,12 @@ import {
   TSlotCornersGettersMap,
   UpdateScore,
   ReduxActionObj,
+  OnePlayerLocalGameState
 } from './frontend'
 
-export {
-  ElectronWindow
-}
 
 export {
+  ElectronWindow,
   UserId,
   RoomId,
   GameId,
@@ -143,6 +140,7 @@ export {
   UserStatus,
   GameStatus,
   UserDataFromAPI,
+  OnePlayerLocalGameState,
   UserDataFromDB,
   PlayerSlots,
   CustomPlayerSlots,
@@ -155,10 +153,7 @@ export {
   SlotType,
   SocketDataItem,
   ChatMessageData,
-  SocketDataItemDgram
-}
-
-export {
+  SocketDataItemDgram,
   HandlerConfig,
   MainRoomData,
   NonMainRoomTypes,
@@ -171,14 +166,12 @@ export {
   GameRoomDataFromDB,
   RoomsData,
   DatabaseAPIData,
-}
-
-export {
   Action,
   ActionItem,
   Animate,
   AppState,
   Audio,
+  BaseTetrimino,
   AutoRepeat,
   BackgroundMusic,
   BaseAward,
@@ -212,7 +205,6 @@ export {
   LevelGoals,
   LineClearScoringDataItem,
   LineClearPatternDataItem,
-  LocalGameState,
   LockClassic,
   LockExtended,
   LockInfinite,
@@ -237,8 +229,6 @@ export {
   ScoringMethods,
   ChatState,
   PartyState,
-  SharedHandlersMap,
-  SharedScope,
   SingleplayerLocalGameState,
   StateUpdateItem,
   SingleplayerOptions,

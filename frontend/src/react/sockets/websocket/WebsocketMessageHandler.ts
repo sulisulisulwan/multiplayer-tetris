@@ -1,10 +1,10 @@
-import { AppState, SocketDataItem } from "multiplayer-tetris-types"
+import { AppState, GameRoomDataAPI, SocketDataItem } from "multiplayer-tetris-types"
 import { ClientToServerActions } from "multiplayer-tetris-types/shared/types"
 import { Dispatch } from "redux"
 import { 
   addIncomingChatMessage, resetChatMessagesToAllMessagesOnServer,
   setUserData, setUserAndPartyData, setUserFriendsData,
-  setPartyState, updatePartyRoomId, initializeMultiplayerGame
+  setPartyState, updatePartyRoomId, initializeMultiPlayerGame
  } from 'multiplayer-tetris-redux'
 
 type WebsocketHandlerArgs = {
@@ -105,7 +105,7 @@ export default class WebsocketMessageHandler {
   }
   protected matchFound({ msgData }: WebsocketHandlerArgs) {
     console.log('outside', msgData)
-    this.reduxDispatch(initializeMultiplayerGame(msgData.gameRoomData))
+    this.reduxDispatch(initializeMultiPlayerGame(msgData.gameRoomData))
   }
 
   protected accountAlreadyInUse() {

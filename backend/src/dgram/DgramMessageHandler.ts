@@ -1,7 +1,7 @@
 import { SocketDataItem } from "multiplayer-tetris-types"
 import DgramServer from "./DgramServer"
 import { DgramServerToClient, RoomId, ServerToClientActions, SocketDataItemDgram } from "multiplayer-tetris-types/shared/types"
-import chalk = require("chalk")
+import chalk from "chalk"
 import { RemoteInfo } from "node:dgram"
 
 type HandlerMap = Map<string, Function>
@@ -27,7 +27,9 @@ export default class MessageHandler {
 
   protected initMap() {
     return new Map([
-      ['trackThisUser', this._handle_trackThisUser.bind(this)],
+      ['trackThisUser', this.trackThisUser.bind(this)],
+      ['activateGame', this.activateGame.bind(this)],
+      ['handleKeyStroke', this.handleKeyStroke.bind(this)],
     ])
   }
 
@@ -44,11 +46,34 @@ export default class MessageHandler {
   }
 
   // protected _handle_demo(socket: Socket, socketDataItem: SocketDataItem<ServerToClientActions>) {
-  protected _handle_trackThisUser(rinfo: RemoteInfo, socketDataItem: SocketDataItemDgram<any>) {
+  protected trackThisUser(rinfo: RemoteInfo, socketDataItem: SocketDataItemDgram<any>) {
+    
+    const userIsTracked = !!this.server.getRemoteAddressInfoByUserId(socketDataItem.userId)
+
     this.server.setUserIdToRemoteAddressInfo(socketDataItem.userId, rinfo)
-    console.log(this.server.getRemoteAddressInfoByUserId(socketDataItem.userId))
-    console.log(this.server.getUserIdByRemoteAddressInfo(rinfo))
-    this.send(rinfo, { action: 'trackingUser', data: null })
+    this.send(rinfo, {
+      action: 'trackingUser', 
+      data: { 
+        userId: socketDataItem.userId, 
+        activateNewGame: !userIsTracked
+      } 
+    })
+  }
+
+
+  protected activateGame(rinfo: RemoteInfo, socketDataItem: SocketDataItemDgram<any>) {
+    const gameRoom = this.server.getGameRoom()
+    gameRoom.activateLoop()
+  }
+
+
+  protected handleKeyStroke(rinfo: RemoteInfo, socketDataItem: SocketDataItemDgram<any>) {
+    const { key, type } = socketDataItem.data
+    const gameRoom  = this.server.getGameRoom()
+    const playerActionHandler = gameRoom.getPlayerActionHandler()
+    const dispatch = gameRoom.getDispatch()
+    const { gameState }= gameRoom.getState()
+    playerActionHandler.keystrokeHandler({ key, type}, gameState, dispatch)
   }
 
 }

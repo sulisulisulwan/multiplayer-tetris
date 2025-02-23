@@ -1,8 +1,9 @@
+import { UserId } from "../../shared"
 import { AppState } from "../shared"
 import * as Redux from 'redux'
 
 export abstract class Action {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>, eventData: EventData): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>, eventData: EventData): void
 }
 export interface ActionItem {
   eliminatorName: string
@@ -29,34 +30,15 @@ export abstract class BaseScoringHandler {
   public abstract updateScore(currentScore: number, scoreItem: ScoreItem): number
 }
 
-export abstract class SharedScope {
-  
-  public scoringHandler: BaseScoringHandler
-  public levelGoalsHandler: LevelGoals
-  public tetriminoMovementHandler: TetriminoMovementHandler
-  public nextQueueHandler: NextQueue
-  public holdQueueHandler: HoldQueue
-
-  constructor(sharedHandlers: SharedHandlersMap) {
-    this.scoringHandler = sharedHandlers.scoringHandler
-    this.levelGoalsHandler = sharedHandlers.levelGoalsHandler
-    this.tetriminoMovementHandler = sharedHandlers.tetriminoMovementHandler
-    this.nextQueueHandler = sharedHandlers.nextQueueHandler
-    this.holdQueueHandler = sharedHandlers.holdQueueHandler
-  }
-
+export abstract class BasePhase {
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
-export abstract class BasePhase extends SharedScope {
-  constructor(sharedHandlers: SharedHandlersMap) {
-    super(sharedHandlers)
-  }
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
-}
+
 export abstract class Animate extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class Completion extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export interface DirectionsMap {
   right: Function
@@ -65,7 +47,7 @@ export interface DirectionsMap {
   inPlace: Function
 }
 export abstract class Eliminate extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export interface EventData {
   key: string,
@@ -74,29 +56,29 @@ export interface EventData {
   currKeystrokes?: Set<string>
 }
 export abstract class FallingClassic extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class FallingExtended extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class FallingInfinite extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class GameOver extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class Generation extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class GoalSpecs {
   public abstract getClearedLinesGoals(level: number, linesCleared?: number): number 
 }
 export abstract class HoldQueue {
-  public abstract setHoldQueueState(gameState: AppState['gameState']): void
-  public abstract handleHoldQueueToggle(gameState: AppState['gameState'], eventData: EventData): void
+  public abstract setHoldQueueState(gameState: OnePlayerLocalGameState): void
+  public abstract handleHoldQueueToggle(gameState: OnePlayerLocalGameState, eventData: EventData): void
 }
 export abstract class Iterate extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class LevelGoals {
   public abstract getNewLevelSpecs(level: number, linesCleared: number): {
@@ -105,28 +87,27 @@ export abstract class LevelGoals {
   }
 }
 export abstract class LockClassic extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class LockExtended extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class LockInfinite extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class NextQueue {
   public abstract dequeue(): Tetrimino
-  public abstract peek(): string
   public abstract queueToArray(length: number): string[]
   public abstract logQueue(length: number): void
 }
 export abstract class Off extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class Pattern extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export abstract class Pregame extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 
 export abstract class SoundEffects extends Audio {
@@ -150,7 +131,7 @@ export abstract class TetriminoMovementHandler {
   public abstract getGhostCoords(tetrimino: Tetrimino, playfield: string[][]): Coordinates[]
 }
 export abstract class UpdateScore extends BasePhase {
-  public abstract execute(gameState: AppState['gameState'], dispatch: Redux.Dispatch<any>): void
+  public abstract execute(gameState: OnePlayerLocalGameState, dispatch: Redux.Dispatch<any>): void
 }
 export interface GamePhases {
   off: Off
@@ -179,23 +160,20 @@ export interface PlayerAction {
   flipCounterClockwise: boolean
   hold: boolean
 }
-export type LocalGameState = SingleplayerLocalGameState | MultiplayerLocalGameState
-export interface SingleplayerLocalGameState {
-  autoRepeatDelayTimeoutId: null | ReturnType<typeof setTimeout>
+export type SingleplayerLocalGameState = OnePlayerLocalGameState
+export type MultiplayerLocalGameState = Record<UserId, OnePlayerLocalGameState>
+
+export interface OnePlayerLocalGameState {
   backToBack: boolean
   currentTetrimino: null | Tetrimino
   currentGamePhase: string
   currentLevel: number
   extendedLockdownMovesRemaining: number
-  fallIntervalId: null | ReturnType<typeof setTimeout>
   fallSpeed: number
   gameMode: string
-  gameOptions: GameOptions
   ghostCoords: Coordinates[]
   holdQueue: HoldQueueState
-  leftIntervalId: null | ReturnType<typeof setTimeout>
   levelClearedLinesGoal: number
-  lockTimeoutId: null | ReturnType<typeof setTimeout>
   lowestLockSurfaceRow: null | number
   nextQueue: null | string[]
   patternItems: PatternItem[]
@@ -206,47 +184,14 @@ export interface SingleplayerLocalGameState {
   playfieldOverlay: string[][] | null
   postLockMode: boolean
   pregameCounter: number
-  pregameIntervalId: null | ReturnType<typeof setTimeout>
-  rightIntervalId: null | ReturnType<typeof setTimeout>
   scoreItems: ScoreItem[]
   scoringHistoryPerCycle: ScoringHistoryPerCycle
   totalLinesCleared: number
   totalScore: number
-  type: 'singleplayer'
-}
-export declare interface MultiplayerLocalGameState {
-  autoRepeatDelayTimeoutId: null | ReturnType<typeof setTimeout>
-  backToBack: boolean
-  currentTetrimino: null | Tetrimino
-  currentGamePhase: string
-  currentLevel: number
-  extendedLockdownMovesRemaining: number
-  fallIntervalId: null | ReturnType<typeof setTimeout>
-  fallSpeed: number
+  type: 'singleplayer' | 'multiplayer'
   gameOptions: GameOptions
-  ghostCoords: Coordinates[]
-  holdQueue: HoldQueueState
-  leftIntervalId: null | ReturnType<typeof setTimeout>
-  levelClearedLinesGoal: number
-  lockTimeoutId: null | ReturnType<typeof setTimeout>
-  lowestLockSurfaceRow: null | number
-  nextQueue: null | string[]
-  patternItems: PatternItem[]
-  performedTSpin: boolean
-  performedTSpinMini: boolean
-  playerAction: PlayerAction,
-  playfield: string[][] | null
-  playfieldOverlay: string[][] | null
-  postLockMode: boolean
-  pregameCounter: number
-  pregameIntervalId: null | ReturnType<typeof setTimeout>
-  rightIntervalId: null | ReturnType<typeof setTimeout>
-  scoreItems: ScoreItem[]
-  scoringHistoryPerCycle: ScoringHistoryPerCycle
-  totalLinesCleared: number
-  totalScore: number
-  type: 'multiplayer'
 }
+
 export interface ScoringHistoryPerCycle {
   softdrop?: LineClearScoringDataItem[]
   lineClear?: boolean
@@ -307,13 +252,6 @@ export interface HoldQueueState {
 }
 export interface LevelColorsMap {
   [key: number]: string
-}
-export interface SharedHandlersMap {
-  tetriminoMovementHandler: TetriminoMovementHandler
-  scoringHandler: BaseScoringHandler
-  levelGoalsHandler: LevelGoals
-  nextQueueHandler: NextQueue
-  holdQueueHandler: HoldQueue
 }
 export interface InitialOptions {
   possibleActivePatterns: {
@@ -389,6 +327,14 @@ export interface FlipDirectionsMap {
   flipCounterClockwise: string
   flipClockwise: string
 }
+export interface BaseTetrimino {
+  startingGridPosition: Coordinates,
+  currentOriginOnPlayfield: Coordinates,
+  localGridSize: number,
+  currentOrientation: string,
+  status: string,
+  ghostCoordsOnPlayfield: number[]
+}
 export interface Tetrimino {
   startingGridPosition: Coordinates
   currentOriginOnPlayfield: Coordinates
@@ -397,7 +343,7 @@ export interface Tetrimino {
   status: string
   orientations?: OrientationsMap
   name?: string
-  minoGraphic?: string
+  minoGraphic: string
   ghostCoordsOnPlayfield: number[]
 }
 export interface OrientationsMap {

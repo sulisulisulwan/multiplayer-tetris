@@ -1,3 +1,4 @@
+import { MultiplayerLocalGameState } from "../frontend"
 import { ChatMessageData, GameId, GameStatus, MultiplayerGameTypes, PlayerSlots, RoomId, UserDataFromDB, UserId } from "../shared"
 
 
@@ -33,6 +34,7 @@ export interface PartyRoomDataAPI{
 
 export interface GameRoomDataFromDB {
   id: RoomId
+  gameState: Record<UserId, MultiplayerLocalGameState>
   party1: PartyRoomDataAPI
   party2: PartyRoomDataAPI
   gameType: MultiplayerGameTypes

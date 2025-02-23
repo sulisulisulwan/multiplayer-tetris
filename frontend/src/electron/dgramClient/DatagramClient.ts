@@ -1,7 +1,7 @@
 import * as dgram from 'dgram'
 import { SocketDataItem } from 'multiplayer-tetris-types'
 import ElectronApp from '../ElectronApp'
-import { ClientToElectronActions, DgramServerToClient, SocketDataItemDgram, UserId } from 'multiplayer-tetris-types/shared/types'
+import { ClientToElectronActions, SocketDataItemDgram, UserId } from 'multiplayer-tetris-types/shared/types'
 import chalk = require('chalk')
 const { ipcMain } = require('electron')
 
@@ -9,16 +9,24 @@ class DatagramClient {
 
   protected app: ElectronApp
   protected socketClient: dgram.Socket
-  protected serverAddress: string
-  protected serverPort: number
+  protected destinationAddress: string
+  protected destinationPort: number
   protected userId: UserId
 
-  constructor(serverAddress: string, serverPort: number, electronApp: ElectronApp) {
+  constructor(electronApp: ElectronApp) {
     this.app = electronApp
     this.socketClient = null
-    this.serverAddress = serverAddress
-    this.serverPort = serverPort
+    this.destinationAddress = null
+    this.destinationPort = null
     this.userId = null
+  }
+
+  setServerPortTarget(port: number) {
+    this.destinationPort = port
+  }
+
+  setAddressTarget(address: string) {
+    this.destinationAddress = address
   }
 
   getSocket() {
@@ -33,7 +41,10 @@ class DatagramClient {
   }
 
   killSocket() {
-    this.socketClient.disconnect()
+    if (this.socketClient) {
+      this.socketClient.disconnect()
+      this.socketClient = null
+    }
   }
 
 
@@ -42,23 +53,19 @@ class DatagramClient {
       const socketDataItem = JSON.parse(msg.toString())
       this.app.getWindow().webContents.send('dgram:in', socketDataItem)
     })
-    
-    this.sendData({
-      userId: this.userId,
-      action: 'trackThisUser',
-      data: null
-    })
   }
 
   sendData(socketDataItem: SocketDataItemDgram<any>) {
-    this.socketClient.send(JSON.stringify(socketDataItem), this.serverPort, this.serverAddress)
+    this.socketClient.send(JSON.stringify(socketDataItem), this.destinationPort, this.destinationAddress)
   }
 
 
   async kill() {
-    console.log(chalk.yellow('Killing Dgram connection...'))
-    await this.socketClient.disconnect()
-    this.socketClient = null
+    if (this.socketClient) {
+      console.log(chalk.yellow('Killing Dgram connection...'))
+      await this.socketClient.disconnect()
+      this.socketClient = null
+    }
   }
 }
 

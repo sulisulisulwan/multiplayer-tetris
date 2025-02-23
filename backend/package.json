@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon ./dist/index.js",
     "startchrome": "node --inspect ./dist/index.js",
@@ -15,11 +16,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
     "@types/express": "^5.0.0",
     "@types/socket.io": "^3.0.2",
     "@types/socket.io-client": "^3.0.0",
     "chalk": "4.0.0",
     "express": "^4.19.2",
+    "multiplayer-tetris-core": "file:../core",
+    "multiplayer-tetris-redux": "file:../redux",
     "multiplayer-tetris-types": "file:../types",
     "nodemon": "^3.1.3",
     "socket.io": "^4.8.1",

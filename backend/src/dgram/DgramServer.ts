@@ -1,12 +1,15 @@
 import * as Dgram from 'node:dgram'
+import * as net from 'net'
 import MessageHandler from './DgramMessageHandler.js'
 import { SocketDataItem, SocketId, UserId } from 'multiplayer-tetris-types'
 import { DgramServerToClient, SocketDataItemDgram } from 'multiplayer-tetris-types/shared/types.js'
-import chalk = require('chalk')
+import chalk from 'chalk'
+import RemoteGame from '../remotegamedemo/RemoteGame.js'
+import { findPort } from './findPort.js'
 
-export default class Server {
+export default class DgramServerSocket {
   
-  protected port: number
+  protected gameRoom: RemoteGame
   protected db: any
   protected remoteAddressInfo: {
     userId: Record<UserId, any>
@@ -14,22 +17,48 @@ export default class Server {
   }
   protected messageHandler: MessageHandler
   protected server: Dgram.Socket
+  protected port: number
 
-  constructor() {
-    this.port = 41234
+  constructor(gameRoom: RemoteGame) {
+    this.gameRoom = gameRoom
     this.db = null
     this.remoteAddressInfo = {
       userId: {},
       remoteAddressInfo: {}
     }
     this.messageHandler = new MessageHandler(this)
-    this.server = Dgram.createSocket('udp4')
-    this.initListeners()
+    this.port = null
+    this.server = null
   }
+  
+  public async initiateSocket() {
+    try {
+      this.port = await findPort(40000)
+    } catch(e) {
+      console.log('Error starting dgram server')
+      return
+    }
+    // this.port = 40000
+    this.server = Dgram.createSocket('udp4')
+    await this.initListeners()
+  }
+
+  public getPortAndAddress() {
+    return this.server.address()
+  }
+
+  public getGameRoom() {
+    return this.gameRoom
+  }
+
 
   public setUserIdToRemoteAddressInfo(userId: UserId, rinfo: Dgram.RemoteInfo) {
     this.remoteAddressInfo.userId[userId] = rinfo
     this.remoteAddressInfo.remoteAddressInfo[`${rinfo.address}:${rinfo.port}`] = userId
+  }
+
+  public getAllUsersRemoteAddressInfo() {
+    return Object.values(this.remoteAddressInfo.userId)
   }
 
   public getUserIdByRemoteAddressInfo(rinfo: Dgram.RemoteInfo) {
@@ -49,21 +78,31 @@ export default class Server {
     }
   }
 
-  private initListeners() {
-    const onMessage = this.onMessage.bind(this)
-    const onDisconnect = this.onDisconnect.bind(this)
-    this.server
-      .on('listening', () => {
-        const { address, port } = this.server.address()
-        console.log(`DgramServer listening on ${address}:${port}`)
-      })
-      .on('message', (bufferData, rinfo) => { 
-        const socketDataItem = JSON.parse(bufferData.toString()); 
-        onMessage(rinfo, socketDataItem) 
-      })
-      .on('disconnect', onDisconnect)
-      .on('error', (err: Error) => console.error(err))
-      .bind(this.port)
+  private async initListeners() {
+
+    return new Promise((resolve, reject) => {
+
+      const onMessage = this.onMessage.bind(this)
+      const onDisconnect = this.onDisconnect.bind(this)
+      this.server
+        .on('listening', () => {
+          const { address, port } = this.server.address()
+          console.log(`DgramServer listening on ${address}:${port}`)
+        })
+        .on('message', (bufferData, rinfo) => { 
+          const socketDataItem = JSON.parse(bufferData.toString()); 
+          onMessage(rinfo, socketDataItem) 
+        })
+        .on('disconnect', onDisconnect)
+        .on('error', (err: Error) => {
+          console.log('THIS ERROR IS OCCURING IN DGRAM!!!!')
+          console.error(err)
+          // reject(err)
+        })
+        .bind(this.port, () => {
+          resolve(this.port)
+        })
+    })
   }
 
 
